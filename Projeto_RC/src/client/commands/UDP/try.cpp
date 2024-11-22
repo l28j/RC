@@ -1,6 +1,6 @@
-#include "Start.hpp"
+#include "try.hpp"
 
-int Start::execute() {
+int Try::execute() {
     
     if (this->client->isPlaying()) {
         printf("%s\n", string(PLAYER_IS_PLAYING).c_str());
@@ -10,15 +10,11 @@ int Start::execute() {
     return Command::execute();
 }
 
-void Start::send() {
+void Try::send() {
     string data = this->formatData();
     this->networkClient->sendData(data);
 }
 
-string Start::formatData() {
-    return string(START) + " " + this->ID + " " + this->game_time + "\n";
+string Try::formatData() {
+    return string(START) + " " + this->ID + " " + this->content + " " + this->nT + "\n";
 }
-
-
-
-
