@@ -59,6 +59,9 @@ int main(int argc, char** argv) {
         if(command != nullptr) {
             delete command;
         }
+        if (client.isWin() || client.isLose()) {
+            exit = 1;
+        }
     }   
 
     return 0;

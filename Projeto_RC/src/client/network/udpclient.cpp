@@ -30,6 +30,7 @@ UdpClient::UdpClient(string ip, int port) {
 
 
 int UdpClient::sendData(const string& data) {
+   
     int n = sendto(this->sockfd, data.c_str(), data.length(), 0, (struct sockaddr*) &this->serverAddr, sizeof(this->serverAddr));
 
     if(n < 0) {

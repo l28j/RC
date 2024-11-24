@@ -23,19 +23,26 @@
 #define DEBUG "debug"
 
 #define GAME_START "Game started\n"
-#define GAME_END "Game ended\n"
+#define GAME_END "Exiting..... \nGame ended\n"
 #define GAME_OVER "Game over\n"
+
+#define OK "OK"
+#define NOK "NOK"
+#define ERR "ERR"
 
 //UCP
 #define SNG "SNG"
 #define RSG "RSG"
-#define TRY "TRY"
+#define TRY_ "TRY"
 #define RTR "RTR"
+#define DUP "DUP"   
+#define INV "INV"
+#define ENT "ENT"
+#define ETM "ETM"
 #define QUT "QUT"
 #define RQT "RQT"
 #define DBG "DBG"
 #define RDB "RDB"
-#define ERR "ERR"
 //TCP
 #define STR "STR"
 #define RST "RST"
@@ -54,5 +61,15 @@
 #define MAX_TIME 600 // max time in seconde
 
 #define PLAYER_IS_PLAYING "You are already playing\n"
+#define PLAYER_NOT_PLAYING "You are not playing\n"
+#define ONGOING_GAME "There is already a game in progress with this ID\n"
+#define WIN "You won\n"
+#define DUPLICATE "You already tried this combination\n"
+#define INVALID "Invalid \n"
+#define INVALID_COMMAND_TRY "Invalid command\nUsage: try <color1> <color2> <color3> <color4>\n"
+#define AVAILABLE_COLORS "Available colors: R(red), G(green), B(blue), Y(yellow), O(orange), P(purple)\n"
+#define TIME_IS_OVER "You have reached the maximum time\n"
+#define INVALID_COMMAND_DEBUG "Invalid command\nUsage: debug <ID> <game_time> <color1> <color2> <color3> <color4>\n"
+
 
 #endif

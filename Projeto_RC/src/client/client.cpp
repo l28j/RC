@@ -21,3 +21,29 @@ string Client::getID(){
 void Client::setID(string ID){
     this->ID = ID ;
 }
+
+void Client::setTrials(string trials){
+    this->trials = trials;
+}
+
+string Client::getTrials(){
+    return this->trials;
+}
+
+bool Client::isWin(){
+    return this->win;
+}
+
+void Client::setWin(bool win){
+    this->win = win;
+}
+
+bool Client::isLose(){
+    return this->lose;
+}
+
+void Client::setLose(bool lose){
+    this->lose = lose;
+}
+
+

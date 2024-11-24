@@ -1,9 +1,9 @@
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -Wall -std=c++11 -Icommon -Iclient -Iclient/network -Iclient/commands
+CXXFLAGS = -Wall -std=c++17 -Icommon -Iclient -Iclient/network -Iclient/commands
 
 # Target executable
-TARGET = client
+TARGET = player
 
 # Directories
 SRC_DIR = client

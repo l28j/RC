@@ -1,4 +1,11 @@
 #include "commandcreator.hpp"
+#include "../constants.hpp"    
+#include "commands/UDP/Start.hpp"
+#include "commands/UDP/Try.hpp"
+//#include "commands/UDP/ShowTrials.hpp"
+//#include "commands/UDP/Scoreboard.hpp"
+#include "commands/UDP/Quit.hpp"
+#include "commands/UDP/Debug.hpp"
 
 
 Command* CommandFactory::createCommand(string command, vector<string> arguments) {
@@ -27,29 +34,26 @@ Command* CommandFactory::createStart(vector<string> arguments) {
         return nullptr;
     }
 
-    string ID = arguments[0];
-    string game_time = arguments[1];
-    
-    if(!Verify::isNumber(game_time)){
+    if(!Verify::isNumber(arguments[1])){
         printf("Invalid game time\n");
         return nullptr;
     }
-    if(!Verify::isUID(ID)){
+    if(!Verify::isUID(arguments[0])){
         printf("Invalid ID\n");
         return nullptr;
     }
 
-    return new Start(ID, game_time);
+    return new Start(arguments[0], arguments[1]);
 }
 
 Command* :: CommandFactory::createTry(vector<string> arguments) {
-    if (arguments.size() != 4) {
+    if (arguments.size() != 5) {
         printf("Invalid number of arguments\n");
         printf("Usage: try <color1> <color2> <color3> <color4>\n");
         return nullptr;
     }
 
-    string colors [4] = {arguments[0], arguments[1], arguments[2], arguments[3]};
+    string colors [4] = {arguments[2] , arguments[3] , arguments[4] , arguments[5]};
     
     for (string color : colors) {
         if (!Verify::isColor(color)) {
@@ -58,7 +62,7 @@ Command* :: CommandFactory::createTry(vector<string> arguments) {
         }
     }
 
-    return new Try(color);
+    return new Try(arguments[0], arguments[1], arguments[2] + " " + arguments[3] + " " + arguments[4] + " " + arguments[5]);
 }
 
 Command* CommandFactory::createShowTrials(vector<string> arguments) {
@@ -68,7 +72,7 @@ Command* CommandFactory::createShowTrials(vector<string> arguments) {
         return nullptr;
     }
 
-    return new ShowTrials();
+    return new Quit();
 }
 
 Command* CommandFactory::createScoreboard(vector<string> arguments) {
@@ -78,7 +82,7 @@ Command* CommandFactory::createScoreboard(vector<string> arguments) {
         return nullptr;
     }
 
-    return new Scoreboard();
+    return new Quit();
 }
 
 Command* CommandFactory::createQuit(vector<string> arguments) {
@@ -91,15 +95,6 @@ Command* CommandFactory::createQuit(vector<string> arguments) {
     return new Quit();
 }
 
-Command* CommandFactory::createExit(vector<string> arguments) {
-    if (arguments.size() != 0) {
-        printf("Invalid number of arguments\n");
-        printf("Usage: exit\n");
-        return nullptr;
-    }
-
-    return new Exit();
-}
 
 Command* CommandFactory::createDebug(vector<string> arguments) {
     if (arguments.size() != 6) {
@@ -108,5 +103,5 @@ Command* CommandFactory::createDebug(vector<string> arguments) {
         return nullptr;
     }
 
-    return new Debug();
+    return new Debug(arguments[0], arguments[1], arguments[2] + " " + arguments[3] + " " + arguments[4] + " " + arguments[5]);
 }

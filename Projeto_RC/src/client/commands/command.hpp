@@ -21,6 +21,7 @@ All common methods and attributes for commands are defined here
 class Command {
     protected:
         Client* client;
+        
         unique_ptr<NetworkClient> networkClient;
 
         int networkType;

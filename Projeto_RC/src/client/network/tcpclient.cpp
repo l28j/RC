@@ -14,6 +14,8 @@ TcpClient::TcpClient(string ip, int port) {
     this->serverAddr.sin_port = htons(this->serverPort);
     this->serverAddr.sin_addr.s_addr = inet_addr(this->serverIP.c_str());
 
+    printf("Connecting to %s:%d\n", this->serverIP.c_str(), this->serverPort);
+
     if (connect(this->sockfd, (struct sockaddr *)&this->serverAddr, sizeof(this->serverAddr)) < 0) {
         throw ConnectionFailedError();
     }

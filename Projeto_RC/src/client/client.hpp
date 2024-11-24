@@ -18,9 +18,21 @@ class Client{
         string getGameTime();
         void setGameTime(string game_time);
 
+        string getTrials();
+        void setTrials(string trials);
+
+        bool isWin();
+        void setWin(bool win);
+
+        bool isLose();
+        void setLose(bool lose);
+
     private:
         string ID;
         string game_time;
+        string trials = "0";
+        bool win = false;
+        bool lose = false;
 };
 
 #endif
