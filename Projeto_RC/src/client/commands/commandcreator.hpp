@@ -19,7 +19,6 @@ private:
     static Command* createShowTrials(vector<string> args);
     static Command* createScoreboard(vector<string> args);
     static Command* createQuit(vector<string> args);
-    static Command* createExit(vector<string> args);
     static Command* createDebug(vector<string> args);
     
 };

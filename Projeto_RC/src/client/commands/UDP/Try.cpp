@@ -18,10 +18,10 @@ void Try::send() {
 string Try::formatData() {
     if (!this->client->isWin() ) {
         this->client->setTrials(to_string(stoi(this->client->getTrials()) + 1));
-        return string(TRY_) + " " + this->ID + " " + this->content + " " + this->nT + "\n";
+        return string(TRY_) + " " + this->client->getID() + " " + this->content[0] + " " + this->content[1] + " " + this->content[2] + " " + this->content[3] + " " + this->client->getTrials() + "\n";
     }
     else {
-        return string(TRY_) + " " + this->ID + " " + this->content + " " + this->nT + "\n";
+        return string(TRY_) + " " + this->client->getID() + " " + this->content[0] + " " + this->content[1] + " " + this->content[2] + " " + this->content[3] + " " + this->client->getTrials() + "\n";
     }
 }
 

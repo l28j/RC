@@ -5,11 +5,9 @@
 
 class Try : public Command {
     private:
-        string ID;
-        string nT;
-        string content;
+        vector<string> content;
     public:
-        Try(string ID , string nT, string content) : Command(UDP, TRY), ID(ID), nT(nT), content(content) {}
+        Try(vector<string> content) : Command(UDP, TRY), content(content) {}
         int execute() override;
         void send() override;
         void receive() override;

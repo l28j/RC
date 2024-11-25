@@ -1,6 +1,6 @@
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -Wall -std=c++17 -Icommon -Iclient -Iclient/network -Iclient/commands
+CXXFLAGS = -g -Wall -Wextra -std=c++17 -Icommon -Iclient -Iclient/network -Iclient/commands
 
 # Target executable
 TARGET = player

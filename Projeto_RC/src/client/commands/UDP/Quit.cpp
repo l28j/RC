@@ -26,7 +26,7 @@ void Quit::send() {
 }
 
 string Quit::formatData() {
-    return string(QUIT) + " " + this->client->getID() + "\n";
+    return string(QUT) + " " + this->client->getID() + "\n";
 }
 
 void Quit::receive() {
@@ -37,7 +37,7 @@ void Quit::receive() {
     string command = parser.getCommand();
     vector<string> arguments = parser.getArgs();
 
-    if (command == ERR || command != RQT || arguments.size() != 1) {
+    if (command == ERR || command != RQT || arguments.size() != 5) {
         throw ServerResponseError();
     }
     

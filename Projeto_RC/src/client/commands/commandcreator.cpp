@@ -47,13 +47,13 @@ Command* CommandFactory::createStart(vector<string> arguments) {
 }
 
 Command* :: CommandFactory::createTry(vector<string> arguments) {
-    if (arguments.size() != 5) {
+    if (arguments.size() != 4) {
         printf("Invalid number of arguments\n");
         printf("Usage: try <color1> <color2> <color3> <color4>\n");
         return nullptr;
     }
 
-    string colors [4] = {arguments[2] , arguments[3] , arguments[4] , arguments[5]};
+    string colors [4] = {arguments[0] , arguments[1] , arguments[2] , arguments[3]};
     
     for (string color : colors) {
         if (!Verify::isColor(color)) {
@@ -62,7 +62,7 @@ Command* :: CommandFactory::createTry(vector<string> arguments) {
         }
     }
 
-    return new Try(arguments[0], arguments[1], arguments[2] + " " + arguments[3] + " " + arguments[4] + " " + arguments[5]);
+    return new Try(arguments);
 }
 
 Command* CommandFactory::createShowTrials(vector<string> arguments) {
