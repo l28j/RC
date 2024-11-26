@@ -2,8 +2,12 @@
 #define USER_TCP_CLIENT_H
 
 #include "networkclient.hpp"
-#include <cstring>
 #include <iostream>
+#include <cstring>
+#include <stdexcept>
+#include <netdb.h>
+#include <unistd.h>
+#include <arpa/inet.h>
 
 #include "../../common/common.hpp"
 

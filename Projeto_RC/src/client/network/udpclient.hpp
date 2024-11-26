@@ -2,6 +2,12 @@
 #define USER_UDP_CLIENT_H
 
 #include "networkclient.hpp"
+#include <iostream>
+#include <cstring>
+#include <stdexcept>
+#include <netdb.h>
+#include <unistd.h>
+#include <arpa/inet.h>
 
 using namespace std;
 

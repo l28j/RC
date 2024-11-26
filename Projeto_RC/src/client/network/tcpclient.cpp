@@ -3,22 +3,25 @@
 TcpClient::TcpClient(string ip, int port) {
     this->serverIP = ip;
     this->serverPort = port;
-
-    this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
-    if (this->sockfd < 0) {
+    
+    struct addrinfo hints, *res;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET; // IPv4
+    hints.ai_socktype = SOCK_STREAM; // TCP socket
+    
+    int status = getaddrinfo(this->serverIP.c_str(), std::to_string(this->serverPort).c_str(), &hints, &res);
+    if (status != 0) {
         throw ConnectionSetupError();
     }
-
-    this->serverAddr.sin_family = AF_INET;
-    this->serverAddr.sin_port = htons(this->serverPort);
-    this->serverAddr.sin_addr.s_addr = inet_addr(this->serverIP.c_str());
-
-    printf("Connecting to %s:%d\n", this->serverIP.c_str(), this->serverPort);
-
-    if (connect(this->sockfd, (struct sockaddr *)&this->serverAddr, sizeof(this->serverAddr)) < 0) {
-        throw ConnectionFailedError();
+    
+    this->sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    if (this->sockfd < 0) {
+        freeaddrinfo(res);
+        throw ConnectionSetupError();
     }
+    memcpy(&this->serverAddr, res->ai_addr, res->ai_addrlen);
+    
+    freeaddrinfo(res);
 }
 
 int TcpClient::sendData(const string &data) {

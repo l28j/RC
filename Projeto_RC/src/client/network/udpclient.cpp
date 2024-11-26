@@ -8,26 +8,29 @@
 UdpClient::UdpClient(string ip, int port) {
     this->serverIP = ip;
     this->serverPort = port;
+    
+    struct addrinfo hints, *res;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;  // IPv4
+    hints.ai_socktype = SOCK_DGRAM;  // UDP socket
 
-    /*
-    domain – Specifies the communication 
-        domain ( AF_INET for IPv4/ AF_INET6 for IPv6 ) 
-    type – Type of socket to be created 
-        ( SOCK_STREAM for TCP / SOCK_DGRAM for UDP ) 
-    protocol – Protocol to be used by the socket. 
-        0 means using the default protocol for the address family.  
-    */
-    this->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-
-    if(this->sockfd < 0) {
+    int status = getaddrinfo(this->serverIP.c_str(), std::to_string(this->serverPort).c_str(), &hints, &res);
+    if (status != 0) {
         throw ConnectionSetupError();
     }
 
-    this->serverAddr.sin_family = AF_INET;
-    this->serverAddr.sin_port = htons(this->serverPort);
-    this->serverAddr.sin_addr.s_addr = inet_addr(this->serverIP.c_str());
+    this->sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    if (this->sockfd < 0) {
+        freeaddrinfo(res);
+        throw ConnectionSetupError();
+    }
+    
+    memcpy(&this->serverAddr, res->ai_addr, res->ai_addrlen);
+
+    freeaddrinfo(res);
 }
 
+    
 
 int UdpClient::sendData(const string& data) {
    

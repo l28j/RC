@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
         }
     }
 
+
     printf("Connecting to %s:%d\n", serverIP.c_str(), serverPort);
 
     Client client = Client();
