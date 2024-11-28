@@ -2,8 +2,8 @@
 #include "../constants.hpp"    
 #include "commands/UDP/Start.hpp"
 #include "commands/UDP/Try.hpp"
-//#include "commands/UDP/ShowTrials.hpp"
-//#include "commands/UDP/Scoreboard.hpp"
+#include "commands/TCP/Show_Trials.hpp"
+#include "commands/TCP/Scoreboard.hpp"
 #include "commands/UDP/Quit.hpp"
 #include "commands/UDP/Debug.hpp"
 
@@ -72,7 +72,7 @@ Command* CommandFactory::createShowTrials(vector<string> arguments) {
         return nullptr;
     }
 
-    return new Quit();
+    return new Show_Trials();
 }
 
 Command* CommandFactory::createScoreboard(vector<string> arguments) {
@@ -81,8 +81,8 @@ Command* CommandFactory::createScoreboard(vector<string> arguments) {
         printf("Usage: scoreboard\n");
         return nullptr;
     }
-
-    return new Quit();
+    printf("Scoreboard\n");
+    return new Scoreboard();
 }
 
 Command* CommandFactory::createQuit(vector<string> arguments) {

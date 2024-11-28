@@ -33,7 +33,7 @@ void Try::receive() {
     string command = parser.getCommand();
     vector<string> arguments = parser.getArgs();
 
-    if (command == ERR || command != RTR ) {
+    if (command == ERR || command != RTR || (arguments.size() != 1 && arguments.size() != 4 && arguments.size() != 5)) {
         throw ServerResponseError();
     }
 

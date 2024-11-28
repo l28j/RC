@@ -49,6 +49,9 @@
 #define SSB "SSB"
 #define RSS "RSS"
 #define SSB "SSB"
+#define ACT "ACT"
+#define FIN "FIN"
+
 
 #define RED "R"
 #define GREEN "G"
@@ -70,6 +73,6 @@
 #define AVAILABLE_COLORS "Available colors: R(red), G(green), B(blue), Y(yellow), O(orange), P(purple)\n"
 #define TIME_IS_OVER "You have reached the maximum time\n"
 #define INVALID_COMMAND_DEBUG "Invalid command\nUsage: debug <ID> <game_time> <color1> <color2> <color3> <color4>\n"
-
+#define NO_GAMES "There are no games to show\n"
 
 #endif

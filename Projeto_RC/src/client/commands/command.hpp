@@ -18,6 +18,7 @@ using namespace std;
 Command Abstract Class
 All common methods and attributes for commands are defined here
 */
+
 class Command {
     protected:
         Client* client;

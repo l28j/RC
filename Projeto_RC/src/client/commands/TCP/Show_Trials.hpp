@@ -1,20 +1,17 @@
-#ifndef SCOREBOARD_H
-#define SCOREBOARD_H
-
+#ifndef SHOW_TRIALS_H
+#define SHOW_TRIALS_H
 
 #include "../command.hpp"
 
-
-class Scoreboard : public Command {
+class Show_Trials : public Command {
     private:
     public:
-        Scoreboard() : Command(TCP, SCORE_BOARD) {}    
+        Show_Trials() : Command(TCP, SHOW_TRIALS) {}    
         int execute() override;
         void send() override;
         void receive() override;
         string formatData();
 };
 
-
-
 #endif
+

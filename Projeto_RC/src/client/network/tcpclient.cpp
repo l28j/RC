@@ -21,11 +21,16 @@ TcpClient::TcpClient(string ip, int port) {
     }
     memcpy(&this->serverAddr, res->ai_addr, res->ai_addrlen);
     
+    status = connect(this->sockfd, res->ai_addr, res->ai_addrlen);
+    if (status < 0) {
+        freeaddrinfo(res);
+        throw ConnectionFailedError();
+    }
+
     freeaddrinfo(res);
 }
 
 int TcpClient::sendData(const string &data) {
-    
     int n = write(this->sockfd, data.c_str(), data.length());
 
     if (n < 0) {
