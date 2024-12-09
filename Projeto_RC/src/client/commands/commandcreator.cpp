@@ -1,11 +1,11 @@
 #include "commandcreator.hpp"
 #include "../constants.hpp"    
-#include "commands/UDP/Start.hpp"
-#include "commands/UDP/Try.hpp"
-#include "commands/TCP/Show_Trials.hpp"
-#include "commands/TCP/Scoreboard.hpp"
-#include "commands/UDP/Quit.hpp"
-#include "commands/UDP/Debug.hpp"
+#include "UDP/Start.hpp"
+#include "UDP/Try.hpp"
+#include "TCP/Show_Trials.hpp"
+#include "TCP/Scoreboard.hpp"
+#include "UDP/Quit.hpp"
+#include "UDP/Debug.hpp"
 
 
 Command* CommandFactory::createCommand(string command, vector<string> arguments) {

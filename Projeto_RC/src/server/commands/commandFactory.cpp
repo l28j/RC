@@ -13,23 +13,23 @@ Command* CommandFactory::createCommand(string protocolMessage) {
     }
     else if (command == TRY){
       // printf("Creating logout command\n");
-      return new Try(arguments);
+      return new Start(arguments);
     }
     else if (command == QUT){
       // printf("Creating unregister command\n");
-      return new Quit(arguments);
+      return new Start(arguments);
     }
     else if (command == DBG){
       // printf("Creating listmyauctions command\n");
-      return new Debug(arguments);
+      return new Start(arguments);
     }
     else if (command == STR){
       // printf("Creating listmybids command\n");
-      return new Show_Trials(arguments);
+      return new Start(arguments);
     }
     else if (command == SSB){
       // printf("Creating list command\n");
-      return new Scoreboard(arguments);
+      return new Start(arguments);
     }
   } catch(const std::exception& e ) {
     printf("Command constructor failed because of validations\n");

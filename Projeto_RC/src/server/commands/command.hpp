@@ -24,6 +24,7 @@ protected:
   unique_ptr<Socket> socket;
   string socketType;
   string returnCode;
+  string status ;
 
 public:
   virtual void execute() = 0; //needs to be implemented by the child class

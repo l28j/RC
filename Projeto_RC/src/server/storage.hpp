@@ -15,9 +15,8 @@
 
 using namespace std;
 
-
-
 int playerISPlaying(string PLID);
+
 int canPlay(string PLID);
 
 void createGame(vector<string> arguments);
