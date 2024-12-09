@@ -1,5 +1,5 @@
-#ifndef TCP_SOCKET_HPP
-#define TCP_SOCKET_HPP
+#ifndef __TCPSOCKET_HPP__
+#define __TCPSOCKET_HPP__
 
 #include "socket.hpp"
 

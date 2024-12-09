@@ -23,6 +23,8 @@ class Fs {
 
         int getSize();
 
+        int getFirstLine(string* data);
+
         bool isOpen();
 
         int open(int mode);

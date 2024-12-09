@@ -1,59 +1,82 @@
-#include <iostream>
-#include <cstring>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <unistd.h>
+#include "main.hpp"
 
-#define BUFFER_SIZE 1024
+void runUdpMonitor(ThreadPool* threadPool, int port, bool verbose){
+  printf("Starting udp monitor on port %d %s verbose mode\n", port, verbose ? "with" : "without");
+  UdpSocket udpMonitor = UdpSocket(port, verbose);
 
-int main() {
-    // Definir IP e porta
-    const char* ip = "127.0.0.1";
-    const int port = 58031;
+  while (true){
+    string receivedData = udpMonitor.receiveData();
 
-    // Criar socket UDP
-    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sockfd < 0) {
-        std::cerr << "Erro ao criar o socket." << std::endl;
-        return 1;
+    Command *command = CommandFactory::createCommand(receivedData);
+    if (command == nullptr) {
+      udpMonitor.sendData(ERR);
+      continue;
     }
 
-    // Definir a estrutura do endereço
-    sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = inet_addr(ip);
-    addr.sin_port = htons(port);
+    //set up the socket connection for the command
+    command->setupSocketConnection(
+      port, 
+      verbose, 
+      udpMonitor.getCommandSocketfd(),
+      udpMonitor.getServerInfo(),
+      udpMonitor.getClientInfo()
+    );
 
-    // Associar o socket ao endereço e porta
-    if (bind(sockfd, (sockaddr*)&addr, sizeof(addr)) < 0) {
-        std::cerr << "Erro ao associar o socket ao endereço." << std::endl;
-        close(sockfd);
-        return 1;
+    threadPool->enqueue(command);
+  }
+}
+
+void runTcpMonitor(ThreadPool* threadPool, int port, bool verbose){
+  printf("Starting tcp monitor on port %d %s verbose mode\n", port, verbose ? "with" : "without");
+  TcpSocket tcpMonitor = TcpSocket(port, verbose);
+
+  while (true){
+    string receivedData = tcpMonitor.receiveData();
+
+    Command *command = CommandFactory::createCommand(receivedData);
+    if (command == nullptr) {
+      tcpMonitor.sendData(ERR);
+      continue;
     }
 
-    // Buffer para receber a mensagem
-    char buffer[BUFFER_SIZE];
-    sockaddr_in sender_addr;
-    socklen_t sender_len = sizeof(sender_addr);
+    //set up the socket connection for the command
+    command->setupSocketConnection(
+      port, 
+      verbose, 
+      tcpMonitor.getCommandSocketfd(),
+      tcpMonitor.getServerInfo(),
+      tcpMonitor.getClientInfo()
+    );
 
-    std::cout << "Aguardando mensagens em " << ip << ":" << port << "..." << std::endl;
+    threadPool->enqueue(command);
+  }
+}
 
-    // Ler a mensagem recebida
-    ssize_t bytes_received = recvfrom(sockfd, buffer, BUFFER_SIZE - 1, 0, (sockaddr*)&sender_addr, &sender_len);
-    if (bytes_received < 0) {
-        std::cerr << "Erro ao receber a mensagem." << std::endl;
-        close(sockfd);
-        return 1;
+int main(int argc, char **argv){
+  int port = DEFAULT_PORT;
+  bool verbose = DEFAULT_VERBOSE;
+
+  for (int i = 0; i < argc; i++){
+    string arg = argv[i];
+
+    if (arg == PORT_FLAG)
+    {
+      port = atoi(argv[i + 1]);
     }
+    else if (arg == VERBOSE_FLAG){
+      verbose = true;
+    }
+  }
 
-    // Garantir que o buffer é uma string válida
-    buffer[bytes_received] = '\0';
+  ThreadPool threadPool = ThreadPool();
 
-    // Imprimir a mensagem recebida
-    std::cout << "Mensagem recebida: " << buffer << std::endl;
+  // run each monitor in a separate thread
+  thread udpMonitorThread(runUdpMonitor, &threadPool, port, verbose);
+  thread tcpMonitorThread(runTcpMonitor, &threadPool, port, verbose);
 
-    // Fechar o socket
-    close(sockfd);
-    return 0;
-} 
+  printf("Waiting for monitors to finish\n");
+  udpMonitorThread.join();
+  tcpMonitorThread.join();
+
+  return 0;
+}

@@ -38,6 +38,10 @@ Command* CommandFactory::createStart(vector<string> arguments) {
         printf("Invalid game time\n");
         return nullptr;
     }
+    if(stoi(arguments[1]) < 1 || stoi(arguments[1]) > 600){
+        printf("Invalid game time\n");
+        return nullptr;
+    }
     if(!Verify::isUID(arguments[0])){
         printf("Invalid ID\n");
         return nullptr;

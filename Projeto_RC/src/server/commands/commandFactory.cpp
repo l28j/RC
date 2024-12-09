@@ -1,4 +1,4 @@
-#include "commandcreator.hpp"
+#include "commandFactory.hpp"
 
 Command* CommandFactory::createCommand(string protocolMessage) {
   Parser parser(protocolMessage);
@@ -25,15 +25,11 @@ Command* CommandFactory::createCommand(string protocolMessage) {
     }
     else if (command == STR){
       // printf("Creating listmybids command\n");
-      return new Show_trials(arguments);
+      return new Show_Trials(arguments);
     }
     else if (command == SSB){
       // printf("Creating list command\n");
       return new Scoreboard(arguments);
-    }
-    else if (command == "SRC"){
-      // printf("Creating show record command\n");
-      return new ShowRecord(arguments);
     }
   } catch(const std::exception& e ) {
     printf("Command constructor failed because of validations\n");

@@ -90,6 +90,48 @@ int Fs::getSize() {
 }
 
 /**
+ * @brief Reads first line of file defined in constructor
+ * @param data string pointer to store first line of file
+ * @return int 0 if success, -1 if error
+ */
+
+int Fs::getFirstLine(string* data) {
+    if(!isOpen()) {
+        return -1;
+    }
+
+    int size = getSize();
+
+    if(size <= 0) {
+        return -1;
+    }
+
+    char buffer[size];
+
+    // set file pointer to beginning of file
+    lseek(this->fd, 0, SEEK_SET);
+
+    ssize_t bytesRead = ::read(this->fd, buffer, size);
+
+    if(bytesRead < 0) {
+        return -1;
+    }
+
+    string str(buffer, bytesRead);
+
+    size_t pos = str.find("\n");
+
+    if(pos == string::npos) {
+        return -1;
+    }
+
+    *data = str.substr(0, pos);
+
+    return 0;
+}
+
+
+/**
  * @brief Reads data from file defined in constructor
  * @param data string pointer to store data read from file
  * @return int 0 if success, -1 if error

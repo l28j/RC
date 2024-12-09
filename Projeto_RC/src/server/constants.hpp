@@ -3,27 +3,16 @@
 
 #define UDP 1
 #define TCP 2
+#define DEFAULT_VERBOSE false
 
-#define PORT_FLAG "-p"
 #define VERBOSE_FLAG "-v"
+#define PORT_FLAG "-p"
+#define DEFAULT_IP "127.0.0.1"
 #define DEFAULT_PORT 58031
 
 #define MAX_MESSAGE_SIZE 1024
 #define MAX_TCP_REPLY_SIZE 1024
 
-#define START "SNG"
-#define TRY "TRY"
-#define SHOW_TRIALS "show_trials"
-#define ST "st"
-#define SCORE_BOARD "scoreboard"
-#define SB "sb"
-#define QUIT "quit"
-#define EXIT "exit"
-#define DEBUG "debug"
-
-#define GAME_START "Game started\n"
-#define GAME_END "Exiting..... \nGame ended\n"
-#define GAME_OVER "Game over\n"
 
 #define OK "OK"
 #define NOK "NOK"
@@ -60,6 +49,8 @@
 #define PURPLE "P"
 
 #define MAX_TRIALS 8
-#define MAX_TIME 600 // max time in seconds
+#define MAX_TIME 600 // max time in seconde
+
+
 
 #endif

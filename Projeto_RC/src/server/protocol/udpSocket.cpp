@@ -1,4 +1,4 @@
-#include "udp_socket.hpp"
+#include "udpSocket.hpp"
 
 // constructor for a new UdpSocket
 UdpSocket::UdpSocket(int port, bool verbose) {
@@ -34,11 +34,11 @@ UdpSocket::UdpSocket(int port, bool verbose, int socketfd, struct sockaddr_in se
 }
 
 string UdpSocket::receiveData() {
-  char buffer[MAX_MESSAGE_SIZE] = {0}; //reset buffer
+  char buffer[MAX_MESSAGE_SIZE];
 
   socklen_t len = sizeof(this->clientInfo);
 
-  //recvfrom we get the address of the client that sent the data and store it into clientInfo
+  // when we use recvfrom we get the address of the client that sent the data and store it into clientInfo
   int n = recvfrom(this->monitorSocketfd, buffer, MAX_MESSAGE_SIZE, 0, (struct sockaddr*) &this->clientInfo, &len);
   if (n < 0) {
     return "";
