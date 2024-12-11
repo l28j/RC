@@ -21,6 +21,12 @@ class Fs {
 
         int read(string* data);
 
+        int rename(string* newPath);
+
+        int createDirectory();
+
+        int createFile();
+
         int getSize();
 
         int getFirstLine(string* data);

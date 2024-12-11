@@ -23,10 +23,13 @@ void createGame(vector<string> arguments);
 
 void endGame(string PLID , string status); 
 
+int end_game(string PLID, string status, string score);
+
 void updateGame(string PLID, vector<string> arguments);
 
 void updateScoreboard(string PLID, vector<string> arguments);
 
+int try_command(vector<string> arguments);
 #endif
 
 

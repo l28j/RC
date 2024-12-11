@@ -188,3 +188,77 @@ void endGame(string PLID, string status){
 
     }
 }
+
+
+int end_game(string PLID, string status, string score){
+    //arguments=<PLID, end_date, end_time, start_time, result(code)>
+
+
+    std::string filepath = "src/server/GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    
+    std::string buffer="";
+
+    time_t full_time ;
+    struct tm* nowLocal;
+    string time_str = "";
+    time(&full_time);
+    
+    nowLocal = gmtime(&full_time);
+    nowLocal->tm_year += 1900;
+    nowLocal->tm_mon += 1;
+
+
+    Fs file = Fs(filepath);
+
+    int error = file.open(WRITE);
+    if (error < 0){
+        throw runtime_error("Failed to open file");
+    }
+
+    buffer = std::string("\n") + to_string(nowLocal->tm_year) + to_string(nowLocal->tm_mon) + to_string(nowLocal->tm_mday) + " " 
+    + to_string(nowLocal->tm_hour) + to_string(nowLocal->tm_min) + to_string(nowLocal->tm_sec) + score;
+
+    error = file.writeOnNewLine(&buffer);
+    if (error < 0){
+        throw runtime_error("Failed to write to file");
+    }
+
+    error = file.close();
+    if(error < 0){
+        throw runtime_error("Failed to close to file");
+    }
+
+    string dir_path = "src/server/GAMES/" + PLID + "/";
+    string new_path = dir_path  
+    + to_string(nowLocal->tm_year) + to_string(nowLocal->tm_mon) + to_string(nowLocal->tm_mday) + "_" 
+    + to_string(nowLocal->tm_hour) + to_string(nowLocal->tm_min) + to_string(nowLocal->tm_sec) + "_"
+    + status + ".txt";
+
+
+
+    Fs directory = Fs(dir_path);
+
+    error = directory.createDirectory();
+    if(error < 0){
+        throw runtime_error("Failed to create Directory");
+    }
+
+    //Passo redundante?
+    /*
+    Fs newfile = Fs(newpath);
+    error = newfile.createFile();
+    if(error < 0){
+        throw runtime_error("Failed to Create Destinationn File");
+    }*/
+
+    //move file, rename should eliminate old path
+    error = file.rename(&new_path);
+    if(error < 0){
+        throw runtime_error("Failed to move file");
+    }
+
+
+        //PARTE DO SCORE BOARD ...
+
+    return 0;
+}

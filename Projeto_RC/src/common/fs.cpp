@@ -1,5 +1,7 @@
 #include "fs.hpp"
 
+#include <sys/stat.h>
+
 string Fs::getPath() {
     return this->path;
 }
@@ -189,3 +191,43 @@ int Fs::writeOnNewLine(string* data) {
 
     return 0;
 }
+
+int Fs::rename(string* newpath) {
+
+    if (isOpen()) {
+        throw runtime_error("Cannot move an open file. Close the file first.");
+    }
+
+    std::string newpath_str = newpath->c_str();
+    if (::rename(this->path.c_str(), newpath_str.c_str()) != 0) {
+        return -1;
+    }
+
+    this->path = newpath_str;
+
+    return 0;
+}
+
+
+int Fs::createDirectory(){
+    if (mkdir(this->path.c_str(), 0755) != 0) {
+        if (errno != EEXIST) {
+            return -1;
+        }
+    }
+    return 0;
+}
+
+int Fs::createFile() {
+    // Open the file in write mode, creating it if it doesn't exist
+    if (this->open(WRITE) < 0) {
+        return -1; 
+    }
+
+    if (this->close() < 0) {
+        return -1; 
+    }
+
+    return 0;
+}
+
