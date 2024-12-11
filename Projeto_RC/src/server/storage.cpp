@@ -1,11 +1,20 @@
 
 #include "storage.hpp"
 #include <string>
-
+#include <filesystem>
 
 void createGame(vector<string> arguments){
+
+    string dir_path = "src/server/_GAMES";
+
+    namespace fs = std::filesystem;
+
+    if (!fs::exists(dir_path)){
+        fs::create_directory(dir_path);
+    }
+
     //Build path to the file
-    string path = "_GAMES/" + string("GAME") + "_" + arguments[0] + ".txt";
+    string path = dir_path + "/" + string("GAME") + "_" + arguments[0] + ".txt";
 
     Fs file  = Fs(path);
     
@@ -38,10 +47,18 @@ void createGame(vector<string> arguments){
 
 int canPlay(string PLID){
     //Build path to the file
-    string path = "_GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    string dir_path = "src/server/_GAMES";
+
+    string path = dir_path + "/" + string("GAME") + "_" + PLID + ".txt";
+
+    //verify if the file exists
+    namespace fs = std::filesystem;
+
+    if (!fs::exists(path)){
+        return 1;
+    }
 
     Fs file  = Fs(path);
-
 
     string first_line = "";
     vector<string> arguments;
@@ -80,29 +97,94 @@ int canPlay(string PLID){
 
     //Check if the player can play
 
+    int time_remaining = stoi(time_to_play) - (now - stoi(start_time));
+    printf("Time remaining: %d\n", time_remaining);
+
     if (stoi(time_to_play) > (now - stoi(start_time))){
-        return 0;
+        printf("Player can play\n");
+        return 1;
     }
     else{
-        return -1;
+        printf("Player can't play\n");
+        return 0;
     }
 }
 
 int playerISPlaying(string PLID){
     //Build path to the file
-    string path = "GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
 
-    Fs file  = Fs(path);
+    namespace fs = std::filesystem;
 
-    if (file.isOpen()){
+    if (!fs::exists(path)){
         return 0;
     }
-    else{
-        return -1;
-    }
+
+    return 1;
 }
 
-
-
+void endGame(string PLID, string status){
     
+    //Create Dir to this client
+
+    string dir_path = "src/server/_GAMES/" + PLID + "/";
+
+    namespace fs = std::filesystem;
+    if (!fs::exists(dir_path)){
+        fs::create_directory(dir_path);
+    }
+
+    //End game and move it to the client dir
+
+    time_t full_time ;
+    struct tm* nowLocal;
+    string time_str = "";
+    time(&full_time);
     
+    nowLocal = gmtime(&full_time);
+    nowLocal->tm_year += 1900;
+    nowLocal->tm_mon += 1;
+
+    string new_path = dir_path  
+    + to_string(nowLocal->tm_year) + to_string(nowLocal->tm_mon) + to_string(nowLocal->tm_mday) + "_" 
+    + to_string(nowLocal->tm_hour) + to_string(nowLocal->tm_min) + to_string(nowLocal->tm_sec) + "_"
+    + status + ".txt";
+
+    //Move the file
+
+    fs::rename("src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt", new_path);
+
+    if (status == "W"){
+        //Update the scoreboard
+        string score_dir = "src/server/_SCORES";
+        if (!fs::exists(score_dir)){
+            fs::create_directory(score_dir);
+        }
+
+        string score_path = score_dir + "_" + PLID + to_string(nowLocal->tm_year) + to_string(nowLocal->tm_mon) + to_string(nowLocal->tm_mday) 
+                            + "_" + to_string(nowLocal->tm_hour) + to_string(nowLocal->tm_min) + to_string(nowLocal->tm_sec) + ".txt";
+        
+        Fs file = Fs(score_path);
+
+        int error = file.open(WRITE);
+
+        if (error < 0){
+            throw runtime_error("Failed to open file");
+        }
+
+        string data = PLID + " \n";
+
+        error = file.write(&data);
+
+        if (error < 0){
+            throw runtime_error("Failed to write to file");
+        }
+
+        error = file.close();
+
+        if (error < 0){
+            throw runtime_error("Failed to close file");
+        }
+
+    }
+}

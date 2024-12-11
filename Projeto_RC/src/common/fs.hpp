@@ -30,6 +30,8 @@ class Fs {
         int open(int mode);
         int close();
 
+        int writeOnNewLine(string* data);
+
         string getPath();
 
 

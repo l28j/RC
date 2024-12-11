@@ -162,3 +162,30 @@ int Fs::read(string* data) {
 
     return 0;
 }
+
+/**
+ * @brief Writes data to file defined in constructor on a new line
+ * @param data string pointer to data to be written to file
+ * @return int 0 if success, -1 if error
+ */
+int Fs::writeOnNewLine(string* data) {
+    if (!isOpen()) {
+        return -1; 
+    }
+
+    // Move the cursor to the end of the file
+    if (lseek(this->fd, 0, SEEK_END) < 0) {
+        return -1;
+    }
+
+    std::string dataWithNewline = data->c_str();
+    if (dataWithNewline.back() != '\n') {
+        dataWithNewline += '\n'; // Add newline if not already present
+    }
+
+    if (::write(this->fd, dataWithNewline.c_str(), dataWithNewline.size()) < 0) {
+        return -1;
+    }
+
+    return 0;
+}

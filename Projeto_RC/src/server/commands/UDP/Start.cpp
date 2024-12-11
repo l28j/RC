@@ -15,7 +15,6 @@ Start::Start(vector<string> args){
 
   if (!Verify::isUID(this->PLID) || !Verify::isNumber(this->timeStr) 
       || stoi(this->timeStr) < 0 || stoi(this->timeStr) > MAX_TIME){
-        printf("Invalid arguments1\n");
     this->status = ERR;
   }
 }
@@ -24,20 +23,22 @@ void Start::execute(){
 
   //Verify if the arguments are valid
   if (this->status == ERR){
-    this->send(this->returnCode + " " + this->status);
-    printf("Invalid arguments2\n");
-
+    this->send(this->status);
     return;
   }
 
   //Verify if the PLID is already in use
 
   if (playerISPlaying(this->PLID) == 1){
+    if(!canPlay(this->PLID)){
+      endGame(this->PLID, "L");
+    }
     this->status = NOK;
-    this->send(this->returnCode + " " + this->status);
-    printf("Invalid arguments3\n");
+    this->send(this->status);
+
     return;
   }
+
 
   string mode = "P";
   string code = "";
@@ -60,7 +61,7 @@ void Start::execute(){
  
   struct tm* nowLocal;
   string time_str = "";
-
+ 
   time(&full_time);
   full_time_str = to_string(full_time);
   nowLocal = gmtime(&full_time);
@@ -70,17 +71,17 @@ void Start::execute(){
 
   vector<string> arguments = { this->PLID, mode, code, max_time, time_str, full_time_str};
 
+
   try{
     createGame(arguments);
   } catch (const runtime_error& e){
     this->returnCode = "ERR";
-    this->send(this->returnCode);
-    printf("Invalid arguments4\n");
+    this->send(this->status); 
     return;
   }
 
   this->status = OK;
-  this->send(this->returnCode + " " + this->status);
+  this->send(this->status);
 
   return;
 }

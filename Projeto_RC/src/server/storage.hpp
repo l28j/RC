@@ -21,7 +21,7 @@ int canPlay(string PLID);
 
 void createGame(vector<string> arguments);
 
-void endGame(string PLID);  
+void endGame(string PLID , string status); 
 
 void updateGame(string PLID, vector<string> arguments);
 
