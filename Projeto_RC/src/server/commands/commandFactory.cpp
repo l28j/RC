@@ -4,31 +4,28 @@ Command* CommandFactory::createCommand(string protocolMessage) {
   Parser parser(protocolMessage);
   string command = parser.getCommand();
   vector<string> arguments = parser.getArgs();
-
+  
+  for (string arg : arguments) {
+    printf("%s ", arg.c_str());
+  }
   // catch exception throwed by the constructor, in that case the command is invalid and we return NULL 
   try {
     if (command == SNG){
-      // printf("Creating login command\n");
       return new Start(arguments);
     }
     else if (command == TRY){
-      // printf("Creating logout command\n");
       return new Start(arguments);
     }
     else if (command == QUT){
-      // printf("Creating unregister command\n");
-      return new Start(arguments);
+      return new Quit(arguments);
     }
     else if (command == DBG){
-      // printf("Creating listmyauctions command\n");
       return new Start(arguments);
     }
     else if (command == STR){
-      // printf("Creating listmybids command\n");
       return new Start(arguments);
     }
     else if (command == SSB){
-      // printf("Creating list command\n");
       return new Start(arguments);
     }
   } catch(const std::exception& e ) {

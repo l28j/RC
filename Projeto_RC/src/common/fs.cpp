@@ -208,26 +208,3 @@ int Fs::rename(string* newpath) {
     return 0;
 }
 
-
-int Fs::createDirectory(){
-    if (mkdir(this->path.c_str(), 0755) != 0) {
-        if (errno != EEXIST) {
-            return -1;
-        }
-    }
-    return 0;
-}
-
-int Fs::createFile() {
-    // Open the file in write mode, creating it if it doesn't exist
-    if (this->open(WRITE) < 0) {
-        return -1; 
-    }
-
-    if (this->close() < 0) {
-        return -1; 
-    }
-
-    return 0;
-}
-

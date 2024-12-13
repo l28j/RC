@@ -23,10 +23,6 @@ class Fs {
 
         int rename(string* newPath);
 
-        int createDirectory();
-
-        int createFile();
-
         int getSize();
 
         int getFirstLine(string* data);

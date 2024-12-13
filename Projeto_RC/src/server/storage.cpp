@@ -97,15 +97,11 @@ int canPlay(string PLID){
 
     //Check if the player can play
 
-    int time_remaining = stoi(time_to_play) - (now - stoi(start_time));
-    printf("Time remaining: %d\n", time_remaining);
 
     if (stoi(time_to_play) > (now - stoi(start_time))){
-        printf("Player can play\n");
         return 1;
     }
     else{
-        printf("Player can't play\n");
         return 0;
     }
 }
@@ -132,6 +128,9 @@ void endGame(string PLID, string status){
     namespace fs = std::filesystem;
     if (!fs::exists(dir_path)){
         fs::create_directory(dir_path);
+        if (!fs::exists(dir_path)){
+            throw runtime_error("Failed to create directory");
+        }
     }
 
     //End game and move it to the client dir
@@ -152,8 +151,15 @@ void endGame(string PLID, string status){
 
     //Move the file
 
-    fs::rename("src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt", new_path);
+    Fs file = Fs("src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt");
 
+    int error = file.rename(&new_path); 
+
+    if (error < 0){
+        throw runtime_error("Failed to move file");
+    }   
+
+    
     if (status == "W"){
         //Update the scoreboard
         string score_dir = "src/server/_SCORES";
@@ -185,11 +191,55 @@ void endGame(string PLID, string status){
         if (error < 0){
             throw runtime_error("Failed to close file");
         }
-
     }
 }
 
+void getSecretCode(string PLID, string* secret_code) {
+    // Construir o caminho para o arquivo
+    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
 
+    Fs file = Fs(path);
+
+    // Abrir o arquivo
+    int error = file.open(READ);
+    if (error < 0) {
+        throw runtime_error("Failed to open file");
+    }
+
+    string first_line = "";
+
+    // Ler a primeira linha do arquivo
+    error = file.getFirstLine(&first_line);
+    if (error < 0) {
+        throw runtime_error("Failed to read from file");
+    }
+
+    // Fechar o arquivo
+    error = file.close();
+    if (error < 0) {
+        throw runtime_error("Failed to close file");
+    }
+
+    // Processar a linha para extrair o terceiro argumento (CCCC)
+    std::istringstream iss(first_line);
+    std::string token;
+    int space_count = 0;
+
+    while (iss >> token) {
+        space_count++;
+        if (space_count == 3) { // Terceiro argumento após o segundo espaço
+            *secret_code = token;
+            return;
+        }
+    }
+
+    // Caso não encontre o terceiro argumento, lança uma exceção
+    throw runtime_error("Failed to find the third argument in the first line");
+}
+
+
+
+/*
 int end_game(string PLID, string status, string score){
     //arguments=<PLID, end_date, end_time, start_time, result(code)>
 
@@ -244,21 +294,19 @@ int end_game(string PLID, string status, string score){
     }
 
     //Passo redundante?
-    /*
+    
     Fs newfile = Fs(newpath);
     error = newfile.createFile();
     if(error < 0){
         throw runtime_error("Failed to Create Destinationn File");
-    }*/
+    }
 
-    //move file, rename should eliminate old path
     error = file.rename(&new_path);
     if(error < 0){
         throw runtime_error("Failed to move file");
     }
 
 
-        //PARTE DO SCORE BOARD ...
 
     return 0;
-}
+}*/

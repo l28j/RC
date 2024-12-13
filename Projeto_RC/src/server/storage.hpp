@@ -23,7 +23,7 @@ void createGame(vector<string> arguments);
 
 void endGame(string PLID , string status); 
 
-int end_game(string PLID, string status, string score);
+void getSecretCode(string PLID, string* secret_code);
 
 void updateGame(string PLID, vector<string> arguments);
 
