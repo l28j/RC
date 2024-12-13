@@ -5,9 +5,6 @@ Command* CommandFactory::createCommand(string protocolMessage) {
   string command = parser.getCommand();
   vector<string> arguments = parser.getArgs();
   
-  for (string arg : arguments) {
-    printf("%s ", arg.c_str());
-  }
   // catch exception throwed by the constructor, in that case the command is invalid and we return NULL 
   try {
     if (command == SNG){
@@ -20,7 +17,7 @@ Command* CommandFactory::createCommand(string protocolMessage) {
       return new Quit(arguments);
     }
     else if (command == DBG){
-      return new Start(arguments);
+      return new Debug(arguments);
     }
     else if (command == STR){
       return new Start(arguments);

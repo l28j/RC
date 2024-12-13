@@ -8,7 +8,7 @@
 
 Start::Start(vector<string> args){
   this->socketType = "UDP";
-  this->returnCode = "RSG";
+  this->returnCode = RSG;
 
   this->PLID = args[0];
   this->timeStr = args[1]; 
@@ -40,7 +40,6 @@ void Start::execute(){
   }
 
 
-  string mode = "P";
   string code = "";
   vector<string> colors = { RED, GREEN, BLUE, YELLOW, ORANGE, PURPLE };
 
@@ -69,11 +68,11 @@ void Start::execute(){
              "-" + to_string(nowLocal->tm_mday) + " "
             + to_string(nowLocal->tm_hour) + ":" + to_string(nowLocal->tm_min) + ":" + to_string(nowLocal->tm_sec);
 
-  vector<string> arguments = { this->PLID, mode, code, max_time, time_str, full_time_str};
+  vector<string> arguments = { this->PLID, code, max_time, time_str, full_time_str};
 
 
   try{
-    createGame(arguments);
+    createGame(arguments, "P") ;
   } catch (const runtime_error& e){
     this->returnCode = "ERR";
     this->send(this->status); 

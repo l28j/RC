@@ -3,7 +3,7 @@
 #include <string>
 #include <filesystem>
 
-void createGame(vector<string> arguments){
+void createGame(vector<string> arguments, string mode){
 
     string dir_path = "src/server/_GAMES";
 
@@ -26,8 +26,8 @@ void createGame(vector<string> arguments){
     }
 
     //Write the game to the file
-    string data = arguments[0] + " " + arguments[1] + " " + arguments [2] + " " 
-                + arguments[3] + " " + arguments[4] + " " + arguments[5] + " \n"; 
+    string data = arguments[0] + " " + mode + " " + arguments[1] + " " + arguments [2] + " " 
+                + arguments[3] + " " + arguments[4] + " " + " \n"; 
 
 
     error = file.write(&data);

@@ -4,7 +4,7 @@
 
 Quit::Quit(vector<string> args){
     this->socketType = "UDP";
-    this->returnCode = "RQT";
+    this->returnCode = RQT;
 
     this->PLID = args[0];
 

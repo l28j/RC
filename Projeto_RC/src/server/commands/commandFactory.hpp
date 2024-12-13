@@ -8,6 +8,7 @@
 //include udp commands
 #include "UDP/Start.hpp"
 #include "UDP/Quit.hpp"
+#include "UDP/Debug.hpp"
 
 
 

@@ -19,7 +19,7 @@ int playerISPlaying(string PLID);
 
 int canPlay(string PLID);
 
-void createGame(vector<string> arguments);
+void createGame(vector<string> arguments , string mode);
 
 void endGame(string PLID , string status); 
 

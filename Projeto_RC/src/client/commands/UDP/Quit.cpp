@@ -6,18 +6,9 @@ int Quit::execute() {
         printf("%s\n", string(PLAYER_NOT_PLAYING).c_str());
         return 0;
     }
-    
-    else {
-        int i = Command::execute();
-        if (i == 0) {
-            printf("%s\n", string(GAME_END).c_str());
-            return 1 ;
-        }
-        else {
-            return 0;
-    
-        }
-    }
+    Command::execute();
+    printf("%s\n", string(GAME_END).c_str());
+    return 1;
 }
 
 void Quit::send() {
