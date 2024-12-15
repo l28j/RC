@@ -20,7 +20,7 @@ Command* CommandFactory::createCommand(string protocolMessage) {
       return new Debug(arguments);
     }
     else if (command == STR){
-      return new Start(arguments);
+      return new Show_Trials(arguments);
     }
     else if (command == SSB){
       return new Start(arguments);

@@ -40,7 +40,7 @@ void Quit::execute(){
             secret_code_parts += " ";
         }
     }
-    endGame(this->PLID, "L");
+    endGame(this->PLID, "Q");
     this->status = OK;
     this->send(status + " " + secret_code_parts);
 }

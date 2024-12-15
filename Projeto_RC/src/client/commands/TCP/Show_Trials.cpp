@@ -3,6 +3,10 @@
 
 
 int Show_Trials::execute() {
+    if (!this->client->isPlaying()) {
+        printf("%s\n", string(NO_GAMES).c_str());
+        return 0;
+    }
     return Command::execute();
 }
 
@@ -24,11 +28,12 @@ void Show_Trials::receive() {
     vector<string> arguments = parser.getArgs();
 
     if (command == ERR || command != RST ) {
+        printf("ENTREI1\n");
         throw ServerResponseError();
     }
     
     string status = arguments[0];   
-
+    printf("STATUS: %s\n", status.c_str());
     if (status == ACT || status == FIN) {
         string file_name = arguments[1];
         string file_size = arguments[2];
@@ -45,6 +50,7 @@ void Show_Trials::receive() {
         printf("%s\n", string(NO_GAMES).c_str());
     }
     else {
+        printf("ENTREI2\n");
         throw ServerResponseError();
     }
 }

@@ -31,7 +31,7 @@ void Start::execute(){
 
   if (playerISPlaying(this->PLID) == 1){
     if(!canPlay(this->PLID)){
-      endGame(this->PLID, "L");
+      endGame(this->PLID, "T");
     }
     this->status = NOK;
     this->send(this->status);

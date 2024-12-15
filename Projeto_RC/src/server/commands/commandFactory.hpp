@@ -9,6 +9,8 @@
 #include "UDP/Start.hpp"
 #include "UDP/Quit.hpp"
 #include "UDP/Debug.hpp"
+#include "UDP/Try.hpp"  
+#include "TCP/Show_Trials.hpp"
 
 
 
