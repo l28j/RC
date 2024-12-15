@@ -132,6 +132,103 @@ int Fs::getFirstLine(string* data) {
     return 0;
 }
 
+int Fs::getLastLine(string* data) {
+    if (!isOpen()) {
+        printf("Error: File is not open\n");
+        fflush(stdout);
+        return -1; // File is not open
+    }
+
+    int size = getSize();
+    if (size <= 0) {
+        printf("Error: File is empty or invalid size\n");
+        fflush(stdout);
+        return -1; // File is empty or invalid size
+    }
+
+    // Read the entire file
+    lseek(this->fd, 0, SEEK_SET); // Start from the beginning
+    char buffer[size];
+    ssize_t bytesRead = ::read(this->fd, buffer, size);
+    if (bytesRead <= 0) {
+        printf("Error: Failed to read file\n");
+        fflush(stdout);
+        return -1; // Error reading file
+    }
+
+    string str(buffer, bytesRead);
+
+    // Trim trailing newlines
+    size_t lastPos = str.find_last_not_of("\n\r");
+    if (lastPos == string::npos) {
+        printf("Error: File contains no meaningful content\n");
+        fflush(stdout);
+        return -1; // No meaningful content in the file
+    }
+
+    // Find the start of the last line
+    size_t firstPos = str.rfind("\n", lastPos);
+    if (firstPos == string::npos) {
+        firstPos = 0; // File has only one line
+    } else {
+        firstPos++; // Move to the character after the newline
+    }
+
+    // Extract the last line
+    *data = str.substr(firstPos, lastPos - firstPos + 1);
+
+    return 0; // Success
+}
+
+
+
+int Fs::getNumberOfTrials(int* trialCount) {
+    // Initialize trialCount to 0
+    *trialCount = 0;
+
+    if (!isOpen()) {
+        return -1; // File is not open
+    }
+
+    int size = getSize();
+    if (size <= 0) {
+        return -1; // File is empty or invalid size
+    }
+
+    // Read the file content
+    char buffer[size + 1]; // +1 to null-terminate the buffer
+    lseek(this->fd, 0, SEEK_SET); // Reset file pointer to the beginning
+
+    ssize_t bytesRead = ::read(this->fd, buffer, size);
+    if (bytesRead <= 0) {
+        return -1; // Error reading the file
+    }
+
+    buffer[bytesRead] = '\0'; // Null-terminate the buffer
+
+    // Parse the file line by line
+    std::string currentLine;
+    int trials = 0;
+
+    for (ssize_t i = 0; i <= bytesRead; i++) {
+        char c = buffer[i];
+        // Accumulate characters into the current line
+        if (c != '\n' && c != '\0') {
+            currentLine += c;
+        } else {
+            // Check if the current line starts with "T:"
+            if (!currentLine.empty() && currentLine.find("T:") == 0) {
+                trials++;
+            }
+
+            // Reset the current line for the next iteration
+            currentLine.clear();
+        }
+    }
+
+    *trialCount = trials; // Set the trial count
+    return 0; // Success
+}
 
 /**
  * @brief Reads data from file defined in constructor

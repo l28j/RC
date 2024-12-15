@@ -35,14 +35,15 @@ void secondsRemaining(string PLID, string* seconds);
 
 void getTrials(string PLID, string* trials , string *num_trials);
 
-
-
-
 void updateGame(string PLID, vector<string> arguments);
 
 void updateScoreboard(string PLID, vector<string> arguments);
 
 int try_command(vector<string> arguments);
+
+vector<int> verify_code(string PLID, vector<string> content, string trial);
+
+vector<string> check_try(string PLID, vector<string> content, string trial);
 #endif
 
 

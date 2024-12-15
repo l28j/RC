@@ -11,7 +11,7 @@ Command* CommandFactory::createCommand(string protocolMessage) {
       return new Start(arguments);
     }
     else if (command == TRY){
-      return new Start(arguments);
+      return new Try(arguments);
     }
     else if (command == QUT){
       return new Quit(arguments);

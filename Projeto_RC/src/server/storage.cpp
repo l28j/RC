@@ -372,3 +372,189 @@ void getTrials(string PLID, string *trials , string *num_trials){
     *trials = data;
     *num_trials = to_string(count); 
 }
+
+
+vector<int> verify_code(string PLID, vector<string> content, string trial){
+
+    string dir_path = "src/server/_GAMES";
+
+    string path = dir_path + "/" + string("GAME") + "_" + PLID + ".txt";
+
+    //verify if the file exists
+    namespace fs = std::filesystem;
+
+    if (!fs::exists(path)){
+        return {-1,0};
+    }
+
+    Fs file  = Fs(path);
+
+    string last_line = "";
+    vector<string> arguments;
+
+    int error = file.open(READ);
+
+    if (error < 0){
+        throw runtime_error("Failed to open file");
+    }
+
+    error = file.getLastLine(&last_line);
+
+    if (error < 0){
+        throw runtime_error("Failed to read from file");
+    }
+
+    error = file.close();
+
+    if (error < 0){
+        throw runtime_error("Failed to close file");
+    }
+
+    std::istringstream iss(last_line);
+    std::string token;
+    while (iss >> token) {
+        arguments.push_back(token);
+    }
+
+    string previous_content = arguments[1];
+    string start_time = "";
+    start_time = arguments[6];
+    time_t now = time(NULL);
+    int time_from_start = now - stoi(start_time);
+
+    if(arguments[0].c_str()==PLID)
+        return {1, time_from_start};
+
+    int previous_trial=0; 
+    error = file.open(READ);
+    if (error < 0){
+        throw runtime_error("Failed to open file");
+    }
+    file.getNumberOfTrials(&previous_trial);
+    error = file.close();
+    if (error < 0) {
+        throw runtime_error("Failed to close file");
+    }
+
+    int trial_int = stoi(trial), i=0, count=0;
+    for(i=0;i<4;i++){
+        if(previous_content[i]==content[i][0])
+            count++;
+    }
+    if(count==4)
+        return {2, time_from_start}; //repetido?  
+    if(trial_int == previous_trial + 1){
+        return {1, time_from_start};//ok
+    }
+    else{
+        return {0, time_from_start};//invalido
+    }
+}
+
+vector<string> check_try(string PLID, vector<string> content, string trial){
+    //get solution from file
+    string dir_path = "src/server/_GAMES";
+
+    string path = dir_path + "/" + string("GAME") + "_" + PLID + ".txt";
+
+    //verify if the file exists
+    namespace fs = std::filesystem;
+
+    if (!fs::exists(path)){
+        return {"2"};
+    }
+
+    Fs file  = Fs(path);
+
+    string first_line = "";
+    vector<string> arguments;
+    string time_to_play = "";
+    string start_time = ""; 
+
+    int error = file.open(READ);
+
+    if (error < 0){
+        throw runtime_error("Failed to open file");
+    }
+
+    error = file.getFirstLine(&first_line);
+
+    if (error < 0){
+        throw runtime_error("Failed to read from file");
+    }
+
+    error = file.close();
+
+    if (error < 0){
+        throw runtime_error("Failed to close file");
+    }
+
+    std::istringstream iss(first_line);
+    std::string token;
+    while (iss >> token) {
+        arguments.push_back(token);
+    }
+
+    string solution = arguments[2];
+
+    int i=0, nB=0, j=0, nW=0, h=0;
+    bool hit=false;
+    std::vector<std::string> myStack;
+    myStack.resize(7);
+    for(i=0;i<4;i++){
+        for(j=0; j<4;j++){
+            if(content[i][0]==solution[j] && i==j)
+                nB++;              
+        }
+        for(h=0;h<6;h++){
+            if(content[i]==myStack[h]){
+                hit=true;
+                break;
+            }
+        }
+        for(j=0;j<4;j++){
+            if(content[i][0]==solution[j] && i!=j && hit==false){
+                nW++;
+                myStack.push_back(content[i]);
+                break;
+            }
+        }
+        hit=false;
+    }
+        
+    if(nB==4)
+        return {"1", std::to_string(nB), std::to_string(nW)}; //endgame W
+    else if(stoi(trial)==8)
+        return {"-1", std::to_string(nB), std::to_string(nW)}; //endgame Timeout
+    else
+        return {"0", std::to_string(nB), std::to_string(nW)}; //next try
+}
+
+int try_command(vector<string> arguments){
+    // The first argument is the file path
+    fflush(stdout);
+
+    std::string filepath = "src/server/_GAMES/" + string("GAME") + "_" + arguments[0] + ".txt";
+
+    std::string buffer="";
+    
+    buffer = std::string("\n") + "T: " + arguments[1] + " " + arguments[2] + " " + arguments[3] + " " + arguments[4];
+    Fs file  = Fs(filepath);
+    
+    int error = file.open(WRITE);
+    if (error < 0){
+        throw runtime_error("Failed to open file");
+    }
+
+    error = file.writeOnNewLine(&buffer);
+    if (error < 0){
+        throw runtime_error("Failed to write to file");
+    }
+
+    file.close();
+    if (error < 0){
+        throw runtime_error("Failed to close file");
+    }
+
+    return 0; 
+}

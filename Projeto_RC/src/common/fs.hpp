@@ -27,6 +27,10 @@ class Fs {
 
         int getFirstLine(string* data);
 
+        int getLastLine(string* data);
+
+        int getNumberOfTrials(int* trialCount);
+        
         bool isOpen();
 
         int open(int mode);
