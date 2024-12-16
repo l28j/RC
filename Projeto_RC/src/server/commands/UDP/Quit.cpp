@@ -23,8 +23,7 @@ void Quit::execute(){
         return;
     }
 
-    //Verify if the PLID is already in use
-    if (playerISPlaying(this->PLID) == 0){
+    if (!playerISPlaying(this->PLID)){
         this->status = NOK;
         this->send(this->status);
         return;

@@ -29,7 +29,7 @@ void Start::execute(){
 
   //Verify if the PLID is already in use
 
-  if (playerISPlaying(this->PLID) == 1){
+  if (playerISPlaying(this->PLID)){
     if(!canPlay(this->PLID)){
       endGame(this->PLID, "T");
     }

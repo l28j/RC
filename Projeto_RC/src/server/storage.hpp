@@ -35,15 +35,14 @@ void secondsRemaining(string PLID, string* seconds);
 
 void getTrials(string PLID, string* trials , string *num_trials);
 
-void updateGame(string PLID, vector<string> arguments);
+int isDup(string PLID, vector<string> content);
 
-void updateScoreboard(string PLID, vector<string> arguments);
+int checkTrial(string PLID, string trial);  
 
-int try_command(vector<string> arguments);
+void compare_code(string secret_code, string trial, int *corrects, int *wrongs);
 
-vector<int> verify_code(string PLID, vector<string> content, string trial);
+void try_command(string PLID , vector<string> colors, string numberTry, string* status, string* data);
 
-vector<string> check_try(string PLID, vector<string> content, string trial);
 #endif
 
 

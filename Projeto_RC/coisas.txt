@@ -7,4 +7,7 @@ ja tenha um jogo a decorrrer e tenha acabado o progrma nao deveria nos deixar ac
 caso (start o tempo ja passou start again)
 
 caso o servidor seja fechado de repente o server tem de matar todos os sockets e threads
+
+
+ajustar quit e exit
 */

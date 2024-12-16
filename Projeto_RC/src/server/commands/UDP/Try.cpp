@@ -18,113 +18,78 @@ Try::Try(vector<string> args){
     this->content[i]=args[i+1];
   }
   this->numberTry = args[5]; 
+
+  //Check arguments
+  if(!(Verify::isUID(this->PLID) && Verify::isNumber(this->numberTry) && stoi(this->numberTry) >= 0)){
+    this->status = ERR;
+  }
+  for (i=0; i<4; i++){
+    if(!(Verify::isColor(this->content[i]))){
+      this->status = ERR;
+    }
+  }
+  if (stoi(this->numberTry) > 8 || stoi(this->numberTry) < 0){
+    this->status = INV;
+  }
 }
 
 void Try::execute(){
 
-  //check sytax of message
-  int i=0, j=0;
-  bool check=false;
-  std::vector<std::string> code = {"R", "G", "B", "Y", "O", "P"};
-  for(i=0; i<4; i++){
-    for(j=0; j<6; j++){
-      if(this->content[i]==code[j]){
-        check=true;
-        break;
+    //Verify if the arguments are valid
+    if ((this->status == ERR) || (this->status == INV)){
+      this->send(this->status);
+      return;
+    }
+    
+    //Verify if the PLID is has a game open.
+    if (!playerISPlaying(this->PLID)){
+      this->status=NOK;
+      send(this->status);
+      return;
+    }
+
+    //Verify if the PLID can play
+    if (!canPlay(this->PLID)){
+      this->status=ETM;
+      string secret_code = "";
+      getSecretCode(this->PLID, &secret_code);
+      for (int i = 0; i < 4; i++){
+        this->status +=  " " + std::string(1, secret_code[i]);
       }
-    }
-    if(check==false){
-      this->status=ERR;
-      this->send(this->status);
-      return;
-    }
-    check=false;
-  }
-
-  if (!Verify::isUID(this->PLID) || !Verify::isNumber(this->numberTry) 
-      || stoi(this->numberTry) < 0){
-    this->status = ERR;
-    return;
-  }
-
-  if (this->status == ERR){
-    this->send(this->status);
-    return;
-  }
-
-  //Verify if the PLID is has a game open.
-
-  if (playerISPlaying(this->PLID) == 1){
-    if(!canPlay(this->PLID)){
+      send(this->status);
       endGame(this->PLID, "T");
-      this->status = ETM;
-      this->send(this->status);
       return;
     }
-  }
-  else{
-    this->status = NOK;
-    this->send(this->status);
-    return;
-  }
-    //Make sure the play is new (trial is different, +1) or DUP
-  vector<int> verification = verify_code(this->PLID, this->content, this->numberTry);
-  if(verification[0]==0){
-    this->status=INV;
-    send(this->status);
-    return;
-  }
-  else if(verification[0]==2){
-    printf("DUPLICATED \n");
-    fflush(stdout);
-    this->status=DUP;
-    send(this->status);
-    return;
-  }
 
-  string str_content = this->content[0] + this->content[1] + this->content[2] + this->content[3];
-  vector<string> result = check_try(this->PLID, this->content, this->numberTry);
-  vector<string> arguments = {this->PLID, str_content ,result[1], result[2], std::to_string(verification[1])};
-  if(stoi(result[0])==1){
-    try{ try_command(arguments);
-    } catch (const runtime_error& e){
-    this->returnCode = "ERR";
-    this->send(this->status); 
-    return;
-    }
-    endGame(this->PLID, "W");
-    printf("WIN \n");
-    fflush(stdout);
-    this->status=OK;
-    send(this->status);
-    return;
-  }
-  else if(stoi(result[0])==-1){
-    try{ try_command(arguments);
-    } catch (const runtime_error& e){
-      this->returnCode = "ERR";
-      this->send(this->status); 
+    if(isDup(this->PLID, this->content)){
+      this->status=DUP;
+      send(this->status);
       return;
     }
-    endGame(this->PLID, "L");
-    printf("LOSS\n");
-    fflush(stdout);
-    this->status=ENT;
-    send(this->status);
-    return;
-  }
 
-  try{try_command(arguments);
-  } catch (const runtime_error& e){
-    this->returnCode = "ERR";
-    this->send(this->status); 
-    return;
-  }
+    if (!checkTrial(this->PLID, this->numberTry)){
+      this->status=INV;
+      send(this->status);
+      return;
+    }
 
-  printf("OK \n");
-  fflush(stdout);
+    string status = "";
+    string data = "";
+    try_command(this->PLID, this->content, this->numberTry, &status, &data);
 
-  this->status=OK;
-  send(this->status);
-  return;
+    this->status = status;
+    this->send(this->status + " " + data);
 }
+
+    
+
+    
+
+
+
+
+
+
+
+
+
