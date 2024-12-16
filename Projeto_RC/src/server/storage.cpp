@@ -45,8 +45,8 @@ void createGame(vector<string> arguments, string mode){
     }
 }
 
+
 void endGame(string PLID, string status){
-    
     //Create Dir to this client
 
     string dir_path = "src/server/_GAMES/" + PLID + "/";
@@ -57,14 +57,17 @@ void endGame(string PLID, string status){
         if (!fs::exists(dir_path)){
             throw runtime_error("Failed to create directory");
         }
-    }
+    } 
 
-    //End game and move it to the client dir
-
+    //Set new path 
     time_t full_time ;
     struct tm* nowLocal;
     string time_str = "";
     time(&full_time);
+
+    string time_reamining = "";
+
+    secondsRemaining(PLID, &time_reamining);
     
     nowLocal = gmtime(&full_time);
     nowLocal->tm_year += 1900;
@@ -75,20 +78,9 @@ void endGame(string PLID, string status){
     + to_string(nowLocal->tm_hour) + to_string(nowLocal->tm_min) + to_string(nowLocal->tm_sec) + "_"
     + status + ".txt";
 
-    //Move the file
-
-    Fs file = Fs("src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt");
-
-    int error = file.rename(&new_path); 
-
-    if (error < 0){
-        throw runtime_error("Failed to move file");
-    }   
-
-    
     if (status == "W"){
         //Update the scoreboard
-        string score_dir = "src/server/_SCORES";
+        string score_dir = "src/server/_SCORES/";
         if (!fs::exists(score_dir)){
             fs::create_directory(score_dir);
         }
@@ -104,8 +96,28 @@ void endGame(string PLID, string status){
             throw runtime_error("Failed to open file");
         }
 
-        string data = PLID + " \n";
+        string trials = "";
 
+        string score_str = "";
+        string max_time = "";
+        string game_time = "";  
+        string num_trials = "";
+        string secret_code = "";  
+        string game_mode = "";  
+
+        getMaxTime(PLID, &max_time);
+        getTrials(PLID, &trials, &num_trials);
+        getSecretCode(PLID, &secret_code);
+        getMode(PLID, &game_mode);
+        game_time = to_string(stoi(max_time) - stoi(time_reamining));
+
+        int score_int = score(stoi(max_time), stoi(game_time), stoi(num_trials));
+
+        score_str = to_string(score_int);
+
+        string data = "";
+ 
+        data = score_str + " " + PLID + " " + secret_code + " " + num_trials + " " + game_mode + "\n";
         error = file.write(&data);
 
         if (error < 0){
@@ -118,6 +130,44 @@ void endGame(string PLID, string status){
             throw runtime_error("Failed to close file");
         }
     }
+
+    Fs file = Fs("src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt");
+
+ 
+    int error ;
+
+    string max_time = "";
+    getMaxTime(PLID, &max_time);
+    int game_time = stoi(max_time) - stoi(time_reamining);
+    string game_time_str = to_string(game_time);
+    
+    string end_line = to_string(nowLocal->tm_year) + "-" + to_string(nowLocal->tm_mon) + "-" + to_string(nowLocal->tm_mday) + " " 
+                    + to_string(nowLocal->tm_hour) + ":" + to_string(nowLocal->tm_min) + ":" + to_string(nowLocal->tm_sec) + " " + game_time_str + " \n";
+
+    error = file.open(WRITE);
+
+    if (error < 0){
+        throw runtime_error("Failed to open file");
+    }
+
+    error = file.writeOnNewLine(&end_line);
+    
+    if (error < 0){
+        throw runtime_error("Failed to write to file");
+    }
+
+    error = file.close();
+
+    if (error < 0){
+        throw runtime_error("Failed to close file");
+    }
+
+    file.rename(&new_path); 
+}
+
+
+int score(int max_time , int game_time , int num_trials){
+    return 100 *(0.4*((600 - max_time)/600) + 0.3*((max_time-game_time)/max_time) + 0.2*((8 - num_trials)/8));
 }
 
 string getArgument(string arguments, int index) {
@@ -134,6 +184,44 @@ string getArgument(string arguments, int index) {
         return "";
     }
     return args[index];
+}
+
+void getMode(string PLID, string* mode) {
+    // Construir o caminho para o arquivo
+    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
+
+    Fs file = Fs(path);
+
+    // Abrir o arquivo
+    int error = file.open(READ);
+    if (error < 0) {
+        throw runtime_error("Failed to open file");
+    }
+
+    string first_line = "";
+
+    // Ler a primeira linha do arquivo
+    error = file.getFirstLine(&first_line);
+
+    if (error < 0) {
+        throw runtime_error("Failed to read from file");
+    }
+
+    // Fechar o arquivo
+    error = file.close();
+
+    if (error < 0) {
+        throw runtime_error("Failed to close file");
+    }
+
+    string mode_str = getArgument(first_line, 1);
+
+    if (mode_str == "") {
+        throw runtime_error("Failed to find the second argument in the first line");
+    }
+
+    *mode = mode_str;
+
 }
 
 void getSecretCode(string PLID, string* secret_code) {
@@ -421,16 +509,30 @@ int checkTrial(string PLID, string trial){
 
 }
 
-void compare_code(string secret_code, string trial, int *corrects, int *wrongs){
+void compare_code(string secret_code, string trial, int *corrects, int *wrongs) {
     *corrects = 0;
     *wrongs = 0;
 
-    for (int i = 0; i < 4; i++){
-        if (secret_code[i] == trial[i]){
+    vector<bool> matched_secret(4, false); 
+    vector<bool> matched_trial(4, false); 
+
+    for (int i = 0; i < 4; i++) {
+        if (secret_code[i] == trial[i]) {
             (*corrects)++;
+            matched_secret[i] = true;
+            matched_trial[i] = true;
         }
-        else if (secret_code.find(trial[i]) != string::npos){
-            (*wrongs)++;
+    }
+
+    for (int i = 0; i < 4; i++) {
+        if (!matched_trial[i]) { 
+            for (int j = 0; j < 4; j++) {
+                if (!matched_secret[j] && trial[i] == secret_code[j]) { 
+                    (*wrongs)++;
+                    matched_secret[j] = true; 
+                    break;
+                }
+            }
         }
     }
 }

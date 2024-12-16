@@ -39,6 +39,10 @@ int isDup(string PLID, vector<string> content);
 
 int checkTrial(string PLID, string trial);  
 
+int score(int max_time , int game_time , int num_trials);
+
+void getMode(string PLID, string* mode) ;
+
 void compare_code(string secret_code, string trial, int *corrects, int *wrongs);
 
 void try_command(string PLID , vector<string> colors, string numberTry, string* status, string* data);
