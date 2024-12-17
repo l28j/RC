@@ -9,4 +9,10 @@ caso (start o tempo ja passou start again)
 caso o servidor seja fechado de repente o server tem de matar todos os sockets e threads
 
 ajustar quit e exit
+
+ajustar start 
+
+ajustar try 
+
+ajustar show_tiral
 */
