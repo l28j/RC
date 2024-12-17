@@ -39,6 +39,7 @@
 #define SSB "SSB"
 #define ACT "ACT"
 #define FIN "FIN"
+#define EMPTY "EMPTY"   
 
 
 #define RED "R"

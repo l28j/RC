@@ -27,7 +27,7 @@ void Scoreboard::receive() {
         throw ServerResponseError();
     }
 
-    else if ( command == RSS) {
+    else if ( command == RSS && arguments[0] == OK) {
         string input = parser.getInput();
         string content_to_show;
         string file_name = arguments[1];
@@ -42,7 +42,9 @@ void Scoreboard::receive() {
         file.write(&content_to_show);
         file.close();
     }
-
+    else if (command == RSS && arguments[0] == EMPTY) {
+        printf("%s\n", string(EMPTY_SCOREBOARD).c_str());
+    }
     else {
         throw ServerResponseError();
     }

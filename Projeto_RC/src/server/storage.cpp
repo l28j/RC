@@ -42,7 +42,6 @@ void createGame(vector<string> arguments, string mode){
     }
 }
 
-
 void endGame(string PLID, string status){
     //Create Dir to this client
 
@@ -111,6 +110,8 @@ void endGame(string PLID, string status){
         int score_int = score(stoi(max_time), stoi(game_time), stoi(num_trials));
 
         score_str = to_string(score_int);
+        
+        game_mode == "P" ? game_mode = "PLAY" : game_mode = "DEBUG";
 
         string data = "";
  
@@ -161,8 +162,6 @@ void endGame(string PLID, string status){
 
     file.rename(&new_path); 
 }
-
-
 
 int score(int max_time , int game_time , int num_trials){
     int result = 100 * (0.4 * ((600.0 - max_time) / 600.0) +
@@ -614,9 +613,5 @@ void try_command(string PLID , vector<string> colors, string numberTry, string* 
     }
     
 }
-
-
-
-
 
     

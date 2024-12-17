@@ -51,6 +51,7 @@
 #define SSB "SSB"
 #define ACT "ACT"
 #define FIN "FIN"
+#define EMPTY "EMPTY"   
 
 
 #define RED "R"
@@ -74,5 +75,6 @@
 #define TIME_IS_OVER "You have reached the maximum time\n"
 #define INVALID_COMMAND_DEBUG "Invalid command\nUsage: debug <ID> <game_time> <color1> <color2> <color3> <color4>\n"
 #define NO_GAMES "There are no games to show\n"
+#define EMPTY_SCOREBOARD "There are no games to display on the scoreboard\n"
 
 #endif
