@@ -27,6 +27,8 @@ class Client{
         bool isLose();
         void setLose(bool lose);
 
+        void reset();
+
     private:
         string ID;
         string game_time;

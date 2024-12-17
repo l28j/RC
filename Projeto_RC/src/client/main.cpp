@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
             delete command;
         }
         if (client.isWin() || client.isLose()) {
-            exit = 1;
+            client.reset();
         }
     }   
 

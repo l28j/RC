@@ -47,3 +47,9 @@ void Client::setLose(bool lose){
 }
 
 
+void Client::reset(){
+    this->game_time = "";
+    this->trials = "0";
+    this->win = false;
+    this->lose = false;
+}
