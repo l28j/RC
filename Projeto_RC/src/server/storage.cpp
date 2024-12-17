@@ -21,7 +21,6 @@ void createGame(vector<string> arguments, string mode){
     int error = file.open(WRITE);
 
     if (error < 0){
-        printf("Failed to open file\n");
         throw runtime_error("Failed to open file");
     }
 
@@ -33,14 +32,12 @@ void createGame(vector<string> arguments, string mode){
     error = file.write(&data);
 
     if (error < 0){
-        printf("Failed to write to file\n");
         throw runtime_error("Failed to write to file");
     }
 
     error = file.close();
 
     if (error < 0){
-        printf("Failed to close file\n");
         throw runtime_error("Failed to close file");
     }
 }
@@ -369,9 +366,6 @@ void secondsRemaining(string PLID, string* seconds) {
 
     // Obter o tempo atual
     time_t now = time(NULL);
-    printf("Now: %ld\n", now);
-    printf("Full time: %s\n", full_time_str.c_str());
-    printf("Max time: %s\n", max_time_str.c_str());
     // Calcular o tempo restante
     int remaining = stoi(max_time_str) - (now - stoi(full_time_str));
     
@@ -560,8 +554,6 @@ void try_command(string PLID , vector<string> colors, string numberTry, string* 
     wrongs = to_string(wrongs_int);
 
     if (corrects_int != 4 && numberTry == "8"){
-        printf("corrects_int: %d\n", corrects_int);
-        printf("numberTry: %s\n", numberTry.c_str());
         *status = "ENT";
         end_code = "F"; 
     }
