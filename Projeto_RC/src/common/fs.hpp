@@ -6,7 +6,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <fcntl.h>
-
+#include <algorithm> 
 using namespace std;
 
 #define READ 1
@@ -27,10 +27,6 @@ class Fs {
 
         int getFirstLine(string* data);
 
-        int getLastLine(string* data);
-
-        int getNumberOfTrials(int* trialCount);
-        
         bool isOpen();
 
         int open(int mode);

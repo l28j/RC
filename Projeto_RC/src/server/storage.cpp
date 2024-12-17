@@ -163,8 +163,12 @@ void endGame(string PLID, string status){
 }
 
 
+
 int score(int max_time , int game_time , int num_trials){
-    return 100 *(0.4*((600 - max_time)/600) + 0.3*((max_time-game_time)/max_time) + 0.2*((8 - num_trials)/8));
+    int result = 100 * (0.4 * ((600.0 - max_time) / 600.0) +
+                          0.3 * ((max_time - game_time) / (float)max_time) +
+                          0.2 * ((8.0 - num_trials) / 8.0));
+    return result;
 }
 
 string getArgument(string arguments, int index) {
@@ -455,35 +459,33 @@ int playerISPlaying(string PLID){
 
 int isDup(string PLID, vector<string> content){
     
+    //Verify if there is any trial
+
     string trials = "";
-    string num_trials = "";
+    string n_trials = "";
+    vector<string> secret_codes ;
 
-    getTrials(PLID, &trials, &num_trials);
+    getTrials(PLID, &trials, &n_trials);
 
-    if (stoi(num_trials) == 0){
+    if (n_trials == "0"){
         return 0;
     }
-    
-    // Encontrar a posição do último '\n'
-    size_t last_pos = trials.rfind("\n"); // Posição do último '\n'
-    if (last_pos == std::string::npos) {
-        throw std::runtime_error("Failed to find the last newline character");
-    }
-    
-    //Extrair a última linha (após o último '\n')
-    std::string last_trial_line = trials.substr(last_pos + 1);
+    string conbined_content = content[0] + content[1] + content[2] + content[3];
 
-    // Validar o conteúdo da última linha
-    if (last_trial_line.empty()) {
-        return 0;
-    }
+    for (int i = 0; i < stoi(n_trials); i++){
+        string trial = "";
+        size_t pos = trials.find("\n");
+        if (pos == string::npos){
+            throw runtime_error("Failed to find the first newline character");
+        }
+        trial = trials.substr(0, pos);
+        trials = trials.substr(pos + 1);
 
-    // Concatenar os elementos do vetor content
-    std::string combined_content = content[0] + content[1] + content[2] + content[3];
+        string code = getArgument(trial, 1);
 
-    // Verificar se a última linha corresponde ao conteúdo esperado
-    if (last_trial_line == combined_content) {
-        return 1;
+        if (conbined_content == code){
+            return 1;
+        }
     }
 
     return 0;
@@ -573,7 +575,7 @@ void try_command(string PLID , vector<string> colors, string numberTry, string* 
 
     string seconds = to_string(stoi(max_time) - stoi(time_remaining));
 
-    string trial = "T: " + str_content + " " + corrects + " " + wrongs + " " + seconds;
+    string trial = "T: " + str_content + " " + corrects + " " + wrongs + " " + seconds + " \n";
 
     //Build path to the file
     string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";

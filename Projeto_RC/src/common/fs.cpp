@@ -133,6 +133,7 @@ int Fs::getFirstLine(string* data) {
 }
 
 
+
 /**
  * @brief Reads data from file defined in constructor
  * @param data string pointer to store data read from file
