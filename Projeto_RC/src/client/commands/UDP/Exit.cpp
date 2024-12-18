@@ -10,7 +10,7 @@ int Exit::execute() {
     printf("%s\n", string(GAME_OVER).c_str());
     printf("%s\n", string(EXITING).c_str());
     int i = Command::execute();
-    
+
     return 1;
 }
 
@@ -40,6 +40,7 @@ void  Exit::receive() {
     string status = arguments[0];   
 
     if (status == OK) {
+        this->client->setID("");
         this->client->setGameTime("");
         this->client->setTrials("0");
         this->client->setWin(false);
