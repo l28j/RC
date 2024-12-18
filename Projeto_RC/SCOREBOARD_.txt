@@ -1,7 +1,7 @@
  	--- Current Scoreboard (TOP10) ---
-01   065   107373   BOYR   4   PLAY
-02   063   106634   RGYO   3   DEBUG
-03   059   106634   BYOP   6   PLAY
+01   059   106634   BYOP   6   DEBUG
+02   000   106634   ROYB   4   DEBUG
+3   059   106634   BYOP   6   PLAY
 04   000   232392   RBOP   4   PLAY
 05   000   202382   GPRO   2   PLAY
 06   000   106634   OBGR   4   PLAY
