@@ -21,7 +21,7 @@ struct SCORELIST {
     char PLID[10][20];
     char colcode[10][20];
     int ntries[10];
-    int mode[10];
+    char mode[10][20];
     int n_scores;
 };
 

@@ -1,26 +1,30 @@
 
-#include "Quit.hpp"
+#include "Exit.hpp"
 
-int Quit::execute() {
+
+int Exit::execute() {
     if (!this->client->isPlaying()) {
-        printf("%s\n", string(PLAYER_NOT_PLAYING).c_str());
-        return 0;
+        printf("%s\n", string(EXITING).c_str());
+        return 1;
     }
     printf("%s\n", string(GAME_OVER).c_str());
+    printf("%s\n", string(EXITING).c_str());
+    int i = Command::execute();
     
-    return Command::execute();
+    return 1;
 }
 
-void Quit::send() {
+void Exit::send() {
     string data = this->formatData();
     this->networkClient->sendData(data);
 }
 
-string Quit::formatData() {
+string Exit::formatData() {
     return string(QUT) + " " + this->client->getID() + "\n";
 }
 
-void Quit::receive() {
+
+void  Exit::receive() {
     string data = this->networkClient->receiveData();
 
     Parser parser =  Parser(data);

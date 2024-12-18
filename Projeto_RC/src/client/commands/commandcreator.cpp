@@ -6,6 +6,7 @@
 #include "TCP/Scoreboard.hpp"
 #include "UDP/Quit.hpp"
 #include "UDP/Debug.hpp"
+#include "UDP/Exit.hpp"
 
 
 Command* CommandFactory::createCommand(string command, vector<string> arguments) {
@@ -17,10 +18,12 @@ Command* CommandFactory::createCommand(string command, vector<string> arguments)
         return CommandFactory::createShowTrials(arguments);
     } else if (command == SCORE_BOARD || command == SB) {
         return CommandFactory::createScoreboard(arguments);
-    } else if (command == QUIT || command == EXIT) {
+    } else if (command == QUIT ) {
         return CommandFactory::createQuit(arguments);
     } else if (command == DEBUG) {
         return CommandFactory::createDebug(arguments);
+    } else if (command == EXIT) {
+        return CommandFactory::createExit(arguments);
     } else {
         printf("Invalid command\n");
         return nullptr;
@@ -99,6 +102,15 @@ Command* CommandFactory::createQuit(vector<string> arguments) {
     return new Quit();
 }
 
+Command* CommandFactory::createExit(vector<string> arguments) {
+    if (arguments.size() != 0) {
+        printf("Invalid number of arguments\n");
+        printf("Usage: exit\n");
+        return nullptr;
+    }
+
+    return new Exit();
+}
 
 Command* CommandFactory::createDebug(vector<string> arguments) {
     if (arguments.size() != 6) {

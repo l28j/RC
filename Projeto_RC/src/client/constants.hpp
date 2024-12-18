@@ -23,7 +23,8 @@
 #define DEBUG "debug"
 
 #define GAME_START "Game started\n"
-#define GAME_END "Exiting..... \nGame ended\n"
+#define EXITING "Exiting..... \n"
+#define GAME_END "Game ended\n"
 #define GAME_OVER "Game over\n"
 
 #define OK "OK"

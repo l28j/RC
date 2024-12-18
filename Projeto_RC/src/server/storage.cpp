@@ -625,7 +625,6 @@ int findTopScores(SCORELIST *list){
     int n_entries, ifile = 0;
     char filename[300];         // Buffer for file path
     FILE *fp;
-    char mode[8];               // Buffer to store mode (PLAY/DEBUG)
 
     // Scan the SCORES directory and sort entries alphabetically
     n_entries = scandir("src/server/_SCORES/", &file_list, nullptr, alphasort);
@@ -648,14 +647,7 @@ int findTopScores(SCORELIST *list){
                        list->PLID[ifile],
                        list->colcode[ifile],
                        &list->ntries[ifile],
-                       mode);
-
-                // Assign mode based on the read string
-                if (strcmp(mode, "P") == 0) {
-                    list->mode[ifile] = MODE_PLAY;
-                } else if (strcmp(mode, "D") == 0) {
-                    list->mode[ifile] = MODE_DEBUG;
-                }
+                          list->mode[ifile]);
 
                 fclose(fp);  // Close the file
                 ++ifile;     // Increment valid file counter
@@ -692,7 +684,7 @@ void sortScores(SCORELIST &list) {
         strcpy(list.PLID[i], temp.PLID[idx]);
         strcpy(list.colcode[i], temp.colcode[idx]);
         list.ntries[i] = temp.ntries[idx];
-        list.mode[i] = temp.mode[idx];
+        strcpy(list.mode[i], temp.mode[idx]);
     }
 }
 

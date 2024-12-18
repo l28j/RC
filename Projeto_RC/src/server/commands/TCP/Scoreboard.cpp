@@ -27,7 +27,6 @@ void Scoreboard::execute(){
         this->status = OK;
         // 4. Append scores to the data string
         for (int i = 0; i < result; i++) {
-            std::string modeStr = (list.mode[i] == MODE_PLAY) ? "PLAY" : "DEBUG";
 
             data += (i < 9 ? "0" : "") + std::to_string(i + 1) + "   " +
             (list.score[i] < 100 ? (list.score[i] < 10 ? "00" : "0") : "") +
@@ -35,7 +34,7 @@ void Scoreboard::execute(){
             std::string(list.PLID[i]) + "   " +
             std::string(list.colcode[i]) + "   " +
             std::to_string(list.ntries[i]) + "   " +
-            modeStr + "\n";
+            std::string(list.mode[i]) + "\n";
         }
     }
 
