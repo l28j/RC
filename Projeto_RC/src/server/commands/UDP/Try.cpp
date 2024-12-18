@@ -61,14 +61,22 @@ void Try::execute(){
       return;
     }
 
-    if(isDup(this->PLID, this->content)){
-      this->status=DUP;
+    int dup=0, trial=0;
+    dup = isDup(this->PLID, this->content);
+    trial = checkTrial(this->PLID, this->numberTry);
+
+    if(dup==2 && trial==2){
+      this->status=OK;
       send(this->status);
       return;
     }
-
-    if (!checkTrial(this->PLID, this->numberTry)){
+    else if (trial==0 || (trial==2 && dup!=2)){
       this->status=INV;
+      send(this->status);
+      return;
+    }
+    else if(dup==1 || dup==2){
+      this->status=DUP;
       send(this->status);
       return;
     }

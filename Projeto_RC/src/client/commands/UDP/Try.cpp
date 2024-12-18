@@ -26,7 +26,15 @@ string Try::formatData() {
 }
 
 void Try::receive() {
-    string data = this->networkClient->receiveData();
+    
+    string data = "";
+    try {
+        data = this->networkClient->receiveData();
+    } catch (const std::runtime_error& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+        this->client->setTrials(to_string(stoi(this->client->getTrials()) - 1));
+        return;
+    }
 
     Parser parser =  Parser(data);
 

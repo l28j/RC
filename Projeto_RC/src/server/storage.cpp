@@ -463,7 +463,7 @@ int playerISPlaying(string PLID){
 int isDup(string PLID, vector<string> content){
     
     //Verify if there is any trial
-
+    int dup_flag=0;
     string trials = "";
     string n_trials = "";
     vector<string> secret_codes ;
@@ -487,10 +487,14 @@ int isDup(string PLID, vector<string> content){
         string code = getArgument(trial, 1);
 
         if (conbined_content == code){
-            return 1;
+            if(i==stoi(n_trials)-1)
+                return 2;
+            else
+                dup_flag=1;
         }
     }
-
+    if(dup_flag==1)
+        return 1;
     return 0;
 }
 
@@ -500,12 +504,15 @@ int checkTrial(string PLID, string trial){
 
     getTrials(PLID, &trials, &num_trials);
 
+    if(stoi(trial) == stoi(num_trials)){
+        return 2;
+    }
+
     if (stoi(trial) == stoi(num_trials) + 1){
         return 1;
     }
 
     return 0;
-
 }
 
 void compare_code(string secret_code, string trial, int *corrects, int *wrongs) {

@@ -44,18 +44,29 @@ int UdpClient::sendData(const string& data) {
 }
 
 string UdpClient::receiveData() {
+    struct timeval timeout;
+    timeout.tv_sec = TIMEOUT_SECONDS;
+    timeout.tv_usec = TIMEOUT_MICROSECONDS;   
+
+    if (setsockopt(this->sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        throw std::runtime_error("Failed to set socket timeout");
+    }
 
     char buffer[MAX_MESSAGE_SIZE];
     socklen_t len = sizeof(this->serverAddr);
-    int n = recvfrom(this->sockfd, buffer, MAX_MESSAGE_SIZE, 0, (struct sockaddr*) &this->serverAddr, &len);
+    int n = recvfrom(this->sockfd, buffer, MAX_MESSAGE_SIZE, 0, (struct sockaddr*)&this->serverAddr, &len);
 
-    if(n < 0) {
-        throw ConnectionFailedError();
+    if (n < 0) {
+        if (errno == EWOULDBLOCK || errno == EAGAIN) {
+            throw std::runtime_error("Connection Timed out. Please try again!");
+        } else {
+            throw ConnectionFailedError();
+        }
     }
-    // Set to n-1 because of the \n, removing \n helps with parsing and printing
+
+    // Remove the newline character if present
     buffer[n-1] = '\0';
 
     string dataReceived = string(buffer);
-
     return dataReceived;
 }

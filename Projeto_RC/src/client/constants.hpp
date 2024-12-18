@@ -64,6 +64,8 @@
 
 #define MAX_TRIALS 8
 #define MAX_TIME 600 // max time in seconde
+#define TIMEOUT_MICROSECONDS 500000
+#define TIMEOUT_SECONDS 0
 
 #define PLAYER_IS_PLAYING "You are already playing\n"
 #define PLAYER_NOT_PLAYING "You are not playing\n"
