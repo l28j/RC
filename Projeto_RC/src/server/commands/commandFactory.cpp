@@ -23,7 +23,7 @@ Command* CommandFactory::createCommand(string protocolMessage) {
       return new Show_Trials(arguments);
     }
     else if (command == SSB){
-      return new Start(arguments);
+      return new Scoreboard();
     }
   } catch(const std::exception& e ) {
     printf("Command constructor failed because of validations\n");

@@ -1,7 +1,11 @@
-
 #include "storage.hpp"
 #include <string>
 #include <filesystem>
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <dirent.h>
 
 void createGame(vector<string> arguments, string mode){
 
@@ -612,6 +616,84 @@ void try_command(string PLID , vector<string> colors, string numberTry, string* 
         endGame(PLID, end_code);
     }
     
+}
+
+
+
+int findTopScores(SCORELIST *list){
+    struct dirent **file_list;  // Directory entries
+    int n_entries, ifile = 0;
+    char filename[300];         // Buffer for file path
+    FILE *fp;
+    char mode[8];               // Buffer to store mode (PLAY/DEBUG)
+
+    // Scan the SCORES directory and sort entries alphabetically
+    n_entries = scandir("src/server/_SCORES/", &file_list, nullptr, alphasort);
+    if (n_entries <= 0) {
+        return 0;  // No valid entries found
+    }
+
+    // Process each file in the SCORES directory
+    while (n_entries--) {
+        // Skip hidden files (names starting with '.')
+        if (file_list[n_entries]->d_name[0] != '.' && ifile < 10) {
+            snprintf(filename, sizeof(filename), "src/server/_SCORES/%s", file_list[n_entries]->d_name);
+
+            // Open the file in read mode
+            fp = fopen(filename, "r");
+            if (fp != nullptr) {
+                // Read and store data into SCORELIST
+                fscanf(fp, "%d %s %s %d %s",
+                       &list->score[ifile],
+                       list->PLID[ifile],
+                       list->colcode[ifile],
+                       &list->ntries[ifile],
+                       mode);
+
+                // Assign mode based on the read string
+                if (strcmp(mode, "P") == 0) {
+                    list->mode[ifile] = MODE_PLAY;
+                } else if (strcmp(mode, "D") == 0) {
+                    list->mode[ifile] = MODE_DEBUG;
+                }
+
+                fclose(fp);  // Close the file
+                ++ifile;     // Increment valid file counter
+            }
+        }
+
+        free(file_list[n_entries]);  // Free memory for the current entry
+    }
+
+    free(file_list);         // Free the file list
+    list->n_scores = ifile;  // Update the number of scores
+
+    return ifile;  // Return the number of files processed
+}
+
+
+void sortScores(SCORELIST &list) {
+    std::vector<int> indices(list.n_scores);
+    
+    for (int i = 0; i < list.n_scores; ++i) 
+        indices[i] = i;
+
+    // Sort indices based on score values, descendent order
+    std::sort(indices.begin(), indices.end(), [&list](int a, int b){
+        return list.score[a] > list.score[b];
+    });
+
+    // Temporary list to hold sorted values
+    SCORELIST temp = list;
+
+    for (int i = 0; i < list.n_scores; ++i) {
+        int idx = indices[i];
+        list.score[i] = temp.score[idx];
+        strcpy(list.PLID[i], temp.PLID[idx]);
+        strcpy(list.colcode[i], temp.colcode[idx]);
+        list.ntries[i] = temp.ntries[idx];
+        list.mode[i] = temp.mode[idx];
+    }
 }
 
     

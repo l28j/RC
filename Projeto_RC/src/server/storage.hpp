@@ -12,8 +12,18 @@
 #include <functional>
 #include <iostream>
 #include "../common/common.hpp" 
-
+#include "constants.hpp"
 using namespace std;
+
+
+struct SCORELIST {
+    int score[10];
+    char PLID[10][20];
+    char colcode[10][20];
+    int ntries[10];
+    int mode[10];
+    int n_scores;
+};
 
 int playerISPlaying(string PLID);
 
@@ -46,6 +56,10 @@ void getMode(string PLID, string* mode) ;
 void compare_code(string secret_code, string trial, int *corrects, int *wrongs);
 
 void try_command(string PLID , vector<string> colors, string numberTry, string* status, string* data);
+
+int findTopScores(SCORELIST *list);
+
+void sortScores(SCORELIST &list);
 
 #endif
 

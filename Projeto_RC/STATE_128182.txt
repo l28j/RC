@@ -1,0 +1,11 @@
+ 	Active game found for player 128182
+Game initiated: 2024-12-18 0:11:46 with 100 seconds to be completed
+
+	--- Transactions found: 4 ---
+
+T: RRRR 1 0 5 
+T: BRYY 0 3 10 
+T: OOOR 1 0 14 
+T: BOOB 0 1 19 
+
+ -- 77 seconds remaining to be completed --

@@ -11,6 +11,7 @@
 #include "UDP/Debug.hpp"
 #include "UDP/Try.hpp"  
 #include "TCP/Show_Trials.hpp"
+#include "TCP/Scoreboard.hpp"
 
 
 

@@ -41,6 +41,8 @@
 #define FIN "FIN"
 #define EMPTY "EMPTY"   
 
+#define MODE_DEBUG 'D'
+#define MODE_PLAY 'P'
 
 #define RED "R"
 #define GREEN "G"
