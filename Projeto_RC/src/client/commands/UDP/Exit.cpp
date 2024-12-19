@@ -10,7 +10,10 @@ int Exit::execute() {
     printf("%s\n", string(GAME_OVER).c_str());
     printf("%s\n", string(EXITING).c_str());
     int i = Command::execute();
-
+    if (i != 0) {
+        std::cerr << "Erro ao executar comando!" << std::endl;
+        return i;
+    }
     return 1;
 }
 
