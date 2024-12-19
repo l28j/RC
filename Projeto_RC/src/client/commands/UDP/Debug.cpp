@@ -20,7 +20,13 @@ string Debug::formatData() {
 }
 
 void Debug::receive() {
-    string data = this->networkClient->receiveData();
+    string data = "";
+    try {
+        data = this->networkClient->receiveData();
+    } catch (const std::runtime_error& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+        return;
+    }
 
     Parser parser =  Parser(data);
 

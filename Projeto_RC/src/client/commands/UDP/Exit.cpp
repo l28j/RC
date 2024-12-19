@@ -7,8 +7,6 @@ int Exit::execute() {
         printf("%s\n", string(EXITING).c_str());
         return 1;
     }
-    printf("%s\n", string(GAME_OVER).c_str());
-    printf("%s\n", string(EXITING).c_str());
     int i = Command::execute();
     if (i != 0) {
         std::cerr << "Erro ao executar comando!" << std::endl;
@@ -28,7 +26,13 @@ string Exit::formatData() {
 
 
 void  Exit::receive() {
-    string data = this->networkClient->receiveData();
+    string data = "";
+    try {
+        data = this->networkClient->receiveData();
+    } catch (const std::runtime_error& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+        return;
+    }
 
     Parser parser =  Parser(data);
 
@@ -48,6 +52,8 @@ void  Exit::receive() {
         this->client->setTrials("0");
         this->client->setWin(false);
         this->client->setLose(false);
+        printf("%s\n", string(GAME_OVER).c_str());
+        printf("%s\n", string(EXITING).c_str());
         printf("Secret code: %s %s %s %s\n", arguments[1].c_str(), arguments[2].c_str(), arguments[3].c_str(), arguments[4].c_str());
     }
     else if (status == NOK) {
