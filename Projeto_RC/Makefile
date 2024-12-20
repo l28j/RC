@@ -1,7 +1,7 @@
 # Compiler
 CXX = g++
-CXXFLAGS =  -Wall -Wextra -std=c++17 -pthread
-#CXXFLAGS = -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused
+#CXXFLAGS =  -g -Wall -Wextra -std=c++17 -pthread
+CXXFLAGS = -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused
 
 # Directories
 USER_DIR = src/client
@@ -15,7 +15,7 @@ COMMON_SOURCES = $(shell find $(COMMON_DIR) -name '*.cpp')
 
 # Executable names
 USER_EXEC = ./player
-SERVER_EXEC = ./server
+SERVER_EXEC = ./GS
 
 # Default target is to build the user and server executables but before clean
 all: clean $(USER_EXEC) $(SERVER_EXEC)

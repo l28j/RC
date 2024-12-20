@@ -10,11 +10,15 @@ void runUdpMonitor(ThreadPool* threadPool, int port, bool verbose) {
         string receivedData = udpMonitor.receiveData();
 
         // Create a Command object from the received data.
-        Command* command = CommandFactory::createCommand(receivedData);
+        std::unique_ptr<Command> command = CommandFactory::createCommand(receivedData);
         if (command == nullptr) {
             udpMonitor.sendData(ERR); // Send error response if the command is invalid.
             continue;
         }
+
+        // Use o comando (o `std::unique_ptr` cuida da liberação automática de memória)
+        command->execute();
+
 
         // Set up the socket connection for the command.
         command->setupSocketConnection(
@@ -26,7 +30,7 @@ void runUdpMonitor(ThreadPool* threadPool, int port, bool verbose) {
         );
 
         // Enqueue the command into the thread pool for execution.
-        threadPool->enqueue(command);
+        threadPool->enqueue(std::move(command));
     }
 }
 
@@ -40,9 +44,9 @@ void runTcpMonitor(ThreadPool* threadPool, int port, bool verbose) {
         string receivedData = tcpMonitor.receiveData();
 
         // Create a Command object from the received data.
-        Command* command = CommandFactory::createCommand(receivedData);
+        std::unique_ptr<Command> command = CommandFactory::createCommand(receivedData);
         if (command == nullptr) {
-            tcpMonitor.sendData(ERR); // Send error response if the command is invalid.
+            tcpMonitor.sendData(ERR); // Send error response if the command is invalid
             continue;
         }
 
@@ -56,7 +60,7 @@ void runTcpMonitor(ThreadPool* threadPool, int port, bool verbose) {
         );
 
         // Enqueue the command into the thread pool for execution.
-        threadPool->enqueue(command);
+        threadPool->enqueue(std::move(command));
     }
 }
 

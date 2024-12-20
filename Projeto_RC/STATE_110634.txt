@@ -1,8 +1,0 @@
- 	Active game found for player 110634
-Game initiated: 2024-12-18 0:7:11 with 200 seconds to be completed
-
-	--- Transactions found: 1 ---
-
-T: RRRR 0 0 4 
-
- -- 186 seconds remaining to be completed --
