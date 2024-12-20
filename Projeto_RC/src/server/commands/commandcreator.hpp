@@ -1,5 +1,5 @@
-#ifndef __COMMAND_FACTORY_HPP__
-#define __COMMAND_FACTORY_HPP__
+#ifndef __COMMAND_CREATOR_HPP__
+#define __COMMAND_CREATOR_HPP__
 
 #include "../constants.hpp"
 #include "command.hpp"
