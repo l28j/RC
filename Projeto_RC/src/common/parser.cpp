@@ -9,23 +9,42 @@ using namespace std;
  * - The args vector contains all words except the first.
  */
 Parser::Parser(string input) {
-    this->input = input; // Store the full input string.
+    this->input = input; // Armazena a string completa de entrada.
 
-    stringstream ss(input); // Create a stringstream to split the input.
+    // Remover múltiplos espaços e tabulações consecutivos.
+    stringstream cleanedInput;
+    bool inWhitespace = false;
+    for (char c : input) {
+        if (isspace(c)) { // Verifica qualquer espaço em branco (inclui espaços, tabulações, etc.)
+            if (!inWhitespace) { // Apenas insere um único espaço se não estivermos em uma sequência de espaços.
+                cleanedInput << ' ';
+                inWhitespace = true;
+            }
+        } else {
+            cleanedInput << c;
+            inWhitespace = false;
+        }
+    }
+
+    // Processar a string limpa.
+    stringstream ss(cleanedInput.str()); // Usar a string sem espaços ou tabulações consecutivos.
     string s;
 
     int i = 0;
 
-    // Split the input into tokens based on spaces.
+    // Dividir a entrada em tokens com base em espaços.
     while (getline(ss, s, ' ')) {
-        if (i == 0) {
-            this->command = s; // The first word is the command.
-        } else {
-            this->args.push_back(s); // Subsequent words are arguments.
+        if (!s.empty()) { // Ignorar tokens vazios.
+            if (i == 0) {
+                this->command = s; // A primeira palavra é o comando.
+            } else {
+                this->args.push_back(s); // Palavras subsequentes são argumentos.
+            }
+            i++;
         }
-        i++;
     }
 }
+
 
 // Returns the first word of the input (the command).
 string Parser::getCommand() {

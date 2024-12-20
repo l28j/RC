@@ -1,7 +1,0 @@
-Last finalized game for player 106221
-Game initiated: 2024-12-20 17:45:00 with 600 seconds to be completed
-Mode: PLAY Secret code: OBPY
-
-	 Game started - no transactions found
-	 Termination: Quit at 2024-12-20 17:45:10, 10 s
-

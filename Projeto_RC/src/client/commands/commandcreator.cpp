@@ -37,16 +37,15 @@ Command* CommandFactory::createStart(vector<string> arguments) {
         printf("Usage: start <ID> <game_time>\n");
         return nullptr;
     }
-
-    if (!Verify::isNumber(arguments[1]) || stoi(arguments[1]) < 1 || stoi(arguments[1]) > 600) {
-        printf("Invalid game time\n");
-        return nullptr;
-    }
     if (!Verify::isUID(arguments[0])) {
         printf("Invalid ID\n");
         return nullptr;
     }
-
+    if (!Verify::isNumber(arguments[1]) || stoi(arguments[1]) < 1 || stoi(arguments[1]) > 600) {
+        printf("Invalid game time\n");
+        return nullptr;
+    }
+   
     return new Start(arguments[0], arguments[1]);
 }
 
@@ -118,6 +117,22 @@ Command* CommandFactory::createDebug(vector<string> arguments) {
         printf("Invalid number of arguments\n");
         printf("Usage: debug <ID> <game_time> <color1> <color2> <color3> <color4>\n");
         return nullptr;
+    }
+    if (!Verify::isUID(arguments[0])) {
+        printf("Invalid ID\n");
+        return nullptr;
+    }
+
+    if (!Verify::isNumber(arguments[1]) || stoi(arguments[1]) < 1 || stoi(arguments[1]) > 600) {
+        printf("Invalid game time\n");
+        return nullptr;
+    }
+
+    for (int i = 2; i < 6; i++) {
+        if (!Verify::isColor(arguments[i])) {
+            printf("Invalid color\n");
+            return nullptr;
+        }
     }
 
     return new Debug(arguments[0], arguments[1], arguments[2] + " " + arguments[3] + " " + arguments[4] + " " + arguments[5]);

@@ -20,12 +20,23 @@ TcpSocket::TcpSocket(int port, bool verbose) {
   // Set server information
   this->serverInfo.sin_port = htons(this->port);
 
-  // Bind socket
-  int err = bind(this->monitorSocketfd, (struct sockaddr*)&this->serverInfo, sizeof(this->serverInfo));
+  int err = bind(this->monitorSocketfd, (struct sockaddr *)&this->serverInfo, sizeof(this->serverInfo));
 
-  if (err < 0){
-    // TODO error handling
-    printf("Error binding socket to port %d\n", this->port);
+  if (err < 0) {
+      // Exibe a mensagem de erro específico
+      perror("Erro ao fazer bind do socket");
+      printf("Erro ao vincular o socket à porta %d. Código de erro: %d\n", this->port, errno);
+
+      // Opcional: tomar ações específicas com base no erro
+      if (errno == EADDRINUSE) {
+          printf("A porta %d já está em uso.\n", this->port);
+      } else if (errno == EACCES) {
+          printf("Permissão negada para vincular à porta %d.\n", this->port);
+      }
+
+      // Encerrar ou liberar recursos se necessário
+      close(this->monitorSocketfd);
+      exit(EXIT_FAILURE);
   }
 
   // Start listening
