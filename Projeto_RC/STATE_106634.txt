@@ -1,12 +1,11 @@
- 	Active game found for player 106634
-Game initiated: 2024-12-20 00:29:11 with 200 seconds to be completed
+Last finalized game for player 106634
+Game initiated: 2024-12-20 0:16:40 with 200 seconds to be completed
+Mode: DEBUG Secret code: RBBB
 
-	--- Transactions found: 3 ---
-
-T: RRRR 1 0 47 
-T: YYYY 0 0 50 
-T: OOOO 0 0 53 
-
- -- 143 seconds remaining to be completed --
- 163 seconds remaining to be completed --
+	 Game started - Transactions found: 3
+T: RRRR 1 0 4 
+T: BBBB 3 0 7 
+T: RBBB 4 0 18 
+	 Termination: Win at 2024-12-20 0:16:58, 18 s
+ted --
  completed --

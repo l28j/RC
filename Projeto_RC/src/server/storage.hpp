@@ -78,4 +78,10 @@ int findTopScores(SCORELIST *list);
 // Sort the scores in descending order.
 void sortScores(SCORELIST &list);
 
+// Finds the most recent game file for a specific player.
+bool FindLastGame(string PLID, string *fname);
+
+// Retrieves game data from a specific game file and counts the trials.
+int getGame(string game, string *data);
+
 #endif

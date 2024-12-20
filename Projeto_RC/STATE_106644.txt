@@ -1,0 +1,9 @@
+Last finalized game for player 106644
+Game initiated: 2024-12-20 00:47:46 with 300 seconds to be completed
+Mode: PLAY Secret code: POBY
+
+	 Game started - Transactions found: 3
+T: RRRR 0 0 3 
+T: YYYY 1 0 6 
+T: RBRB 0 1 12 
+	 Termination: Quit at 2024-12-20 00:48:01, 15 s

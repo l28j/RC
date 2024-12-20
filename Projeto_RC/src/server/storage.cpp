@@ -697,4 +697,111 @@ void sortScores(SCORELIST &list) {
     }
 }
 
+
+bool FindLastGame(string PLID, string * fname) {
+
+    std::string dirname = "src/server/_GAMES/" + PLID + "/";
+
+    namespace fs = std::filesystem;
+
+    // Checks if the directory exists
+    if (!fs::exists(dirname) || !fs::is_directory(dirname)) {
+        return false;
+    }
+
+    std::vector<std::string> filelist;
+
+    // Iterates over the files in the directory
+    for (const auto& entry : fs::directory_iterator(dirname)) {
+        if (entry.is_regular_file()) {
+            filelist.push_back(entry.path().filename().string());
+        }
+    }
+
+    // Checks if there are files in the directory
+    if (filelist.empty()) {
+        return false;
+    }
+
+    // Sorts the files alphabetically
+    std::sort(filelist.begin(), filelist.end());
+
+    // Gets the last file
+    *fname = dirname + filelist.back();
+    return true;
+}
+
+int getGame(string game, string *data) {
+    Fs file = Fs(game);
+    int num_trials = 0;
+
+    // Open the file
+    int error = file.open(READ);
+    if (error < 0) {
+        throw runtime_error("Failed to open file");
+    }
+
+    // Read the file
+    error = file.read(data);
+    if (error < 0) {
+        throw runtime_error("Failed to read from file");
+    }
+
+    // Close the file
+    error = file.close();
+    if (error < 0) {
+        throw runtime_error("Failed to close file");
+    }
     
+    // Count how many '\n' characters are in the file
+    int num_n = 0;
+    for (std::string::size_type i = 0; i < data->size(); i++){
+        if ((*data)[i] == '\n'){
+            num_n++;
+        }
+    }
+
+    if (num_n == 0 || num_n <= 2){
+        return 0;
+    } 
+
+    // Ignore the first line
+    size_t pos = data->find("\n");
+    if (pos == string::npos) {
+        throw runtime_error("Failed to find the first newline character");
+    }
+    *data = data->substr(pos + 1);
+
+    // Ignore the last line (find the penultimate newline)
+    size_t lastPos = data->find_last_of("\n");
+    if (lastPos == string::npos) {
+        throw runtime_error("Failed to find the last newline character");
+    }
+
+    // Find the penultimate newline
+    size_t penultimatePos = data->find_last_of("\n", lastPos - 1);
+    if (penultimatePos == string::npos) {
+        throw runtime_error("Failed to find the penultimate newline character");
+    }
+    *data = data->substr(0, penultimatePos);
+
+    // Count the number of trials correctly
+    string temp = *data;
+    num_trials = 0;
+
+    // Remove leading and trailing whitespaces
+    temp.erase(0, temp.find_first_not_of(" \t\n\r"));  // Remove leading spaces
+    temp.erase(temp.find_last_not_of(" \t\n\r") + 1);  // Remove trailing spaces
+
+    size_t pos1 = 0;
+    while ((pos1 = temp.find("\n")) != string::npos) {
+        num_trials++;
+        temp = temp.substr(pos1 + 1);
+    }
+    // Count the last trial if it doesn't end with '\n'
+    if (!temp.empty()) {
+        num_trials++;
+    }
+
+    return num_trials;
+}

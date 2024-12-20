@@ -1,60 +1,60 @@
 #include "Show_Trials.hpp"
 
-// Executes the command if the client is playing; otherwise, displays no game message.
+// Executes the Show_Trials command, verifying if the player is currently playing.
 int Show_Trials::execute() {
-    if (!this->client->isPlaying()) {
-        printf("%s\n", string(NO_GAMES).c_str());
+    if (this->client->getID().empty()) {
+        printf("%s\n", string(PLAYER_NOT_PLAYING).c_str());
         return 0;
     }
     return Command::execute();
 }
 
-// Sends the formatted command to the server.
+// Sends the formatted Show_Trials command to the server.
 void Show_Trials::send() {
     string data = this->formatData();
     this->networkClient->sendData(data);
 }
 
-// Formats the data with the client ID to be sent to the server.
+// Formats the data to send to the server, including the player's ID.
 string Show_Trials::formatData() {
     return string(STR) + " " + this->client->getID() + "\n";
 }
 
-// Receives and processes the response from the server.
+// Handles the server's response for the Show_Trials command.
 void Show_Trials::receive() {
     string data = this->networkClient->receiveData();
+
     Parser parser = Parser(data);
 
     string command = parser.getCommand();
     vector<string> arguments = parser.getArgs();
 
-    // Handle error responses or unexpected commands.
-    if (command == ERR || command != RST) {
+    // Validate the command and its response.
+    if (command == ERR || command != RST ) {
         throw ServerResponseError();
     }
     
-    string status = arguments[0];
-    printf("STATUS: %s\n", status.c_str()); // Display the status.
-
-    // Extract content sent by file and displays
+    string status = arguments[0];   
+    
     if (status == ACT || status == FIN) {
+        // Handle active or finalized game response.
         string file_name = arguments[1];
         string file_size = arguments[2];
         string input = parser.getInput();
         size_t pos = input.find(file_size);
         string content_to_show = input.substr(pos + file_size.length() + 1);
-        printf("%s\n", content_to_show.c_str()); // Display trials content.
+        printf("%s\n", content_to_show.c_str()); // Print the game content.
 
-        Fs file = Fs(file_name); // Create a file object with the given name.
+        // Save the response to a file.
+        Fs file = Fs(file_name);
         file.open(WRITE);
-        file.write(&content_to_show); // Write trials content to the file.
+        file.write(&content_to_show);
         file.close();
     }
-    // Handle no ongoing games.
     else if (status == NOK) {
+        // No games available for the player.
         printf("%s\n", string(NO_GAMES).c_str());
     }
-    // Handle unexpected statuses.
     else {
         throw ServerResponseError();
     }

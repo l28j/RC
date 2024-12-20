@@ -1,180 +1,258 @@
 #include "fs.hpp"
+
 #include <sys/stat.h>
 
-// Returns the file path associated with this Fs instance.
 string Fs::getPath() {
     return this->path;
 }
 
 /**
- * @brief Opens the file specified in the constructor.
+ * @brief opens file defined in constructor
  * @param mode READ or WRITE
  * @return int 0 if success, -1 if error
  */
 int Fs::open(int mode) {
-    if (mode == READ) {
-        this->fd = ::open(this->path.c_str(), O_RDONLY, 0644); // Open file in read-only mode.
-    } else if (mode == WRITE) {
-        this->fd = ::open(this->path.c_str(), O_WRONLY | O_CREAT, 0644); // Open file in write mode, creating if necessary.
-    } else {
-        return -1; // Invalid mode.
+    // Isto nao consegue abrir o ficheiro dentro de uma pasta
+    if(mode == READ){
+        this->fd = ::open(this->path.c_str(), O_RDONLY, 0644);
+    }
+    else if(mode == WRITE){
+        this->fd = ::open(this->path.c_str(), O_WRONLY | O_CREAT, 0644);
+    }
+    else{
+        return -1;
     }
 
-    return this->fd >= 0 ? 0 : -1; // Return success or failure.
-}
-
-/**
- * @brief Closes the file associated with this Fs instance.
- * @return int 0 if success, -1 if error
- */
-int Fs::close() {
-    if (!isOpen() || ::close(this->fd) < 0) {
-        return -1; // Return error if the file is not open or closing fails.
+    if(this->fd < 0) {
+        return -1;
     }
 
-    this->fd = -1; // Reset the file descriptor.
     return 0;
 }
 
 /**
- * @brief Checks if the file is currently open.
- * @return true if the file is open, false otherwise.
+ * @brief Closes file defined in constructor
+ * @return int 0 if success, -1 if error
+ */
+int Fs::close() {
+    if(!isOpen() || ::close(this->fd) < 0) {
+        return -1;
+    }
+
+    this->fd = -1;
+
+    return 0;
+}
+
+/**
+ * @brief Checks if file defined in constructor is open
+ * @return true if file is open
+ * @return false if file is not open
  */
 bool Fs::isOpen() {
     return this->fd != -1;
 }
 
 /**
- * @brief Writes data to the file.
- * @param data Pointer to the string containing the data to write.
+ * @brief Writes data to file defined in constructor
+ * @param data string pointer to data to be written to file
  * @return int 0 if success, -1 if error
  */
 int Fs::write(string* data) {
-    if (!isOpen()) {
-        return -1; // Return error if the file is not open.
+    if(!isOpen()) {
+        return -1;
+    }
+    
+    if(::write(this->fd, data->c_str(), data->size()) < 0) {
+        return -1;
     }
 
-    return ::write(this->fd, data->c_str(), data->size()) >= 0 ? 0 : -1; // Write to the file and return the result.
+    return 0;
 }
 
 /**
- * @brief Gets the size of the file in bytes.
- * @return int -1 if error, otherwise file size in bytes.
+ * @brief returns size of file in bytes
+ * 
+ * @return int -1 if error, else file size in bytes
  */
 int Fs::getSize() {
-    if (!isOpen()) {
-        return -1; // Return error if the file is not open.
+    if(!isOpen()) {
+        return -1;
     }
 
-    lseek(this->fd, 0, SEEK_SET); // Move to the start of the file.
-    size_t size = lseek(this->fd, 0, SEEK_END); // Get the file size.
-    lseek(this->fd, 0, SEEK_SET); // Reset the file pointer to the start.
+    // set file pointer to beginning of file
+    lseek(this->fd, 0, SEEK_SET);
 
-    return static_cast<int>(size); // Return the file size.
+    size_t size = lseek(this->fd, 0, SEEK_END);
+
+    // set file pointer to beginning of file
+    lseek(this->fd, 0, SEEK_SET);
+
+    return static_cast<int>(size);
 }
 
 /**
- * @brief Reads the first line of the file.
- * @param data Pointer to the string where the first line will be stored.
+ * @brief Reads first line of file defined in constructor
+ * @param data string pointer to store first line of file
  * @return int 0 if success, -1 if error
  */
+
 int Fs::getFirstLine(string* data) {
-    if (!isOpen()) {
-        return -1; // Return error if the file is not open.
+    if(!isOpen()) {
+        return -1;
     }
 
-    int size = getSize(); // Get the size of the file.
+    int size = getSize();
 
-    if (size <= 0) {
-        return -1; // Return error if the file size is invalid.
+    if(size <= 0) {
+        return -1;
     }
 
     char buffer[size];
-    lseek(this->fd, 0, SEEK_SET); // Move to the start of the file.
-    ssize_t bytesRead = ::read(this->fd, buffer, size); // Read the file data.
 
-    if (bytesRead < 0) {
-        return -1; // Return error if reading fails.
+    // set file pointer to beginning of file
+    lseek(this->fd, 0, SEEK_SET);
+
+    ssize_t bytesRead = ::read(this->fd, buffer, size);
+
+    if(bytesRead < 0) {
+        return -1;
     }
 
     string str(buffer, bytesRead);
-    size_t pos = str.find("\n"); // Find the position of the newline character.
 
-    if (pos == string::npos) {
-        return -1; // Return error if no newline is found.
+    size_t pos = str.find("\n");
+
+    if(pos == string::npos) {
+        return -1;
     }
 
-    *data = str.substr(0, pos); // Extract the first line.
+    *data = str.substr(0, pos);
+
     return 0;
 }
 
-
-
-/**
- * @brief Reads all data from the file defined in the constructor.
- * @param data Pointer to the string where the file content will be stored.
- * @return int 0 if success, -1 if error.
+/** 
+ * @brief Reads the last line of the file
+ * @param data string pointer to store the last line of the file
+ * @return int 0 if success, -1 if error
  */
-int Fs::read(string* data) {
+int Fs::getLastLine(string* data) {
     if (!isOpen()) {
-        return -1; // Return error if the file is not open.
+        return -1;
     }
 
-    int size = getSize(); // Get the size of the file.
+    int size = getSize();
 
     if (size <= 0) {
-        return -1; // Return error if the file size is invalid.
+        return -1;
     }
 
     char buffer[size];
-    lseek(this->fd, 0, SEEK_SET); // Move to the start of the file.
-    ssize_t bytesRead = ::read(this->fd, buffer, size); // Read the file content.
+
+    // Set file pointer to the beginning of the file
+    lseek(this->fd, 0, SEEK_SET);
+
+    ssize_t bytesRead = ::read(this->fd, buffer, size);
 
     if (bytesRead < 0) {
-        return -1; // Return error if reading fails.
+        return -1;
     }
 
-    *data = string(buffer, bytesRead); // Store the read data into the provided string.
+    string str(buffer, bytesRead);
+
+    // Localizar o último `\n`
+    size_t lastPos = str.find_last_of("\n");
+    if (lastPos == string::npos) {
+        return -1; // Nenhuma quebra de linha encontrada
+    }
+
+    // Localizar o penúltimo `\n`
+    size_t penultimatePos = str.find_last_of("\n", lastPos - 1);
+
+    if (penultimatePos == string::npos) {
+        // Apenas uma linha no arquivo (ou duas linhas sem conteúdo antes do primeiro `\n`)
+        *data = str.substr(0, lastPos); // Retorna tudo antes do último `\n`
+    } else {
+        // Há pelo menos duas linhas no arquivo
+        *data = str.substr(penultimatePos + 1, lastPos - penultimatePos - 1);
+    }
+
+    return 0;
+}
+
+
+/**
+ * @brief Reads data from file defined in constructor
+ * @param data string pointer to store data read from file
+ * @return int 0 if success, -1 if error
+ */
+int Fs::read(string* data) {
+    if(!isOpen()) {
+        return -1;
+    }
+
+    int size = getSize();
+
+    if(size <= 0) {
+        return -1;
+    }
+
+    char buffer[size];
+
+    // set file pointer to beginning of file
+    lseek(this->fd, 0, SEEK_SET);
+
+    ssize_t bytesRead = ::read(this->fd, buffer, size);
+
+    if(bytesRead < 0) {
+        return -1;
+    }
+
+    *data = string(buffer, bytesRead);
+
     return 0;
 }
 
 /**
- * @brief Writes data to the file on a new line.
- * @param data Pointer to the string containing data to be written to the file.
- * @return int 0 if success, -1 if error.
+ * @brief Writes data to file defined in constructor on a new line
+ * @param data string pointer to data to be written to file
+ * @return int 0 if success, -1 if error
  */
 int Fs::writeOnNewLine(string* data) {
     if (!isOpen()) {
-        return -1; // Return error if the file is not open.
+        return -1; 
     }
 
+    // Move the cursor to the end of the file
     if (lseek(this->fd, 0, SEEK_END) < 0) {
-        return -1; // Return error if seeking to the end fails.
+        return -1;
     }
 
-    string dataWithNewline = *data;
+    std::string dataWithNewline = data->c_str();
     if (dataWithNewline.back() != '\n') {
-        dataWithNewline += '\n'; // Add a newline if not already present.
+        dataWithNewline += '\n'; // Add newline if not already present
     }
 
-    return ::write(this->fd, dataWithNewline.c_str(), dataWithNewline.size()) >= 0 ? 0 : -1; // Write the data.
+    if (::write(this->fd, dataWithNewline.c_str(), dataWithNewline.size()) < 0) {
+        return -1;
+    }
+
+    return 0;
 }
 
-/**
- * @brief Renames the file to a new path.
- * @param newpath Pointer to the string containing the new file path.
- * @return int 0 if success, -1 if error.
- */
 int Fs::rename(string* newpath) {
+
     if (isOpen()) {
-        throw runtime_error("Cannot move an open file. Close the file first."); // Prevent renaming if the file is open.
+        throw runtime_error("Cannot move an open file. Close the file first.");
     }
 
-    string newpath_str = *newpath;
+    std::string newpath_str = newpath->c_str();
     if (::rename(this->path.c_str(), newpath_str.c_str()) != 0) {
-        return -1; // Return error if renaming fails.
+        return -1;
     }
 
-    this->path = newpath_str; // Update the path to the new name.
+    this->path = newpath_str;
+
     return 0;
 }
