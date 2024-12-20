@@ -1,5 +1,6 @@
  	--- Current Scoreboard (TOP10) ---
-01   065   200007   OOYY   7   DEBUG
+01   077   106221   GBRP   1   PLAY
+
 02   065   200007   OOYY   7   DEBUG
 03   063   200011   OYOY   8   DEBUG
 04   063   200011   OYOY   8   DEBUG

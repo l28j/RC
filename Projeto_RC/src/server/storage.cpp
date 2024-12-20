@@ -10,7 +10,7 @@
 
 // Creates a new game file for a player with the provided arguments and mode.
 void createGame(vector<string> arguments, string mode) {
-    string dir_path = "src/server/_GAMES";
+    string dir_path = "src/server/GAMES";
     namespace fs = std::filesystem;
 
     // Create the directory if it doesn't exist.
@@ -47,7 +47,7 @@ void createGame(vector<string> arguments, string mode) {
 
 // Ends a game for the specified player ID (PLID) and updates relevant files based on the status.
 void endGame(string PLID, string status) {
-    string dir_path = "src/server/_GAMES/" + PLID + "/";
+    string dir_path = "src/server/GAMES/" + PLID + "/";
     namespace fs = std::filesystem;
 
     // Create the directory for the player if it doesn't exist.
@@ -84,7 +84,7 @@ void endGame(string PLID, string status) {
 
     // Update the scoreboard if the player has won.
     if (status == "W") {
-        string score_dir = "src/server/_SCORES/";
+        string score_dir = "src/server/SCORES/";
         if (!fs::exists(score_dir)) {
             fs::create_directory(score_dir);
         }
@@ -138,7 +138,7 @@ void endGame(string PLID, string status) {
     }
 
     // Update the game file with the end time and status.
-    Fs file = Fs("src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt");
+    Fs file = Fs("src/server/GAMES/" + string("GAME") + "_" + PLID + ".txt");
     int error;
 
     string max_time = "";
@@ -204,7 +204,7 @@ string getArgument(string arguments, int index) {
 
 // Retrieves the mode (e.g., PLAY or DEBUG) from the game file.
 void getMode(string PLID, string* mode) {
-    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    string path = "src/server/GAMES/" + string("GAME") + "_" + PLID + ".txt";
     Fs file = Fs(path);
 
     // Open the file.
@@ -238,7 +238,7 @@ void getMode(string PLID, string* mode) {
 
 // Retrieves the secret code from the game file.
 void getSecretCode(string PLID, string* secret_code) {
-    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    string path = "src/server/GAMES/" + string("GAME") + "_" + PLID + ".txt";
     Fs file = Fs(path);
 
     // Open the file.
@@ -272,7 +272,7 @@ void getSecretCode(string PLID, string* secret_code) {
 
 // Retrieves the game time and full timestamp from the game file.
 void getGameTime(string PLID, string* game_time) {
-    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    string path = "src/server/GAMES/" + string("GAME") + "_" + PLID + ".txt";
     Fs file = Fs(path);
 
     // Open the file.
@@ -309,7 +309,7 @@ void getGameTime(string PLID, string* game_time) {
 
 // Retrieves the maximum game time from the game file.
 void getMaxTime(string PLID, string* max_time) {
-    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    string path = "src/server/GAMES/" + string("GAME") + "_" + PLID + ".txt";
     Fs file = Fs(path);
 
     // Open the file.
@@ -343,7 +343,7 @@ void getMaxTime(string PLID, string* max_time) {
 
 // Calculates the remaining seconds in the game.
 void secondsRemaining(string PLID, string* seconds) {
-    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    string path = "src/server/GAMES/" + string("GAME") + "_" + PLID + ".txt";
     Fs file = Fs(path);
 
     // Open the file.
@@ -383,7 +383,7 @@ void secondsRemaining(string PLID, string* seconds) {
 
 // Retrieves all trial details and counts the number of trials.
 void getTrials(string PLID, string* trials, string* num_trials) {
-    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    string path = "src/server/GAMES/" + string("GAME") + "_" + PLID + ".txt";
     Fs file = Fs(path);
 
     // Open the file.
@@ -429,7 +429,7 @@ void getTrials(string PLID, string* trials, string* num_trials) {
 
 // Checks if the player can continue playing the game.
 int canPlay(string PLID) {
-    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    string path = "src/server/GAMES/" + string("GAME") + "_" + PLID + ".txt";
     namespace fs = std::filesystem;
 
     // Check if the game file exists.
@@ -450,7 +450,7 @@ int canPlay(string PLID) {
 
 // Checks if a player currently has an active game.
 int playerISPlaying(string PLID) {
-    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    string path = "src/server/GAMES/" + string("GAME") + "_" + PLID + ".txt";
     namespace fs = std::filesystem;
 
     // Return true if the game file exists, false otherwise.
@@ -591,7 +591,7 @@ void try_command(string PLID, vector<string> colors, string numberTry, string* s
     // Format the trial entry.
     string trial = "T: " + str_content + " " + corrects + " " + wrongs + " " + seconds + " \n";
 
-    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
+    string path = "src/server/GAMES/" + string("GAME") + "_" + PLID + ".txt";
     Fs file = Fs(path);
 
     // Open the game file.
@@ -636,7 +636,7 @@ int findTopScores(SCORELIST *list){
     FILE *fp;
 
     // Scan the SCORES directory and sort entries alphabetically
-    n_entries = scandir("src/server/_SCORES/", &file_list, nullptr, alphasort);
+    n_entries = scandir("src/server/SCORES/", &file_list, nullptr, alphasort);
     if (n_entries <= 0) {
         return 0;  // No valid entries found
     }
@@ -645,7 +645,7 @@ int findTopScores(SCORELIST *list){
     while (n_entries--) {
         // Skip hidden files (names starting with '.')
         if (file_list[n_entries]->d_name[0] != '.' && ifile < 10) {
-            snprintf(filename, sizeof(filename), "src/server/_SCORES/%s", file_list[n_entries]->d_name);
+            snprintf(filename, sizeof(filename), "src/server/SCORES/%s", file_list[n_entries]->d_name);
 
             // Open the file in read mode
             fp = fopen(filename, "r");
@@ -700,7 +700,7 @@ void sortScores(SCORELIST &list) {
 
 bool FindLastGame(string PLID, string * fname) {
 
-    std::string dirname = "src/server/_GAMES/" + PLID + "/";
+    std::string dirname = "src/server/GAMES/" + PLID + "/";
 
     namespace fs = std::filesystem;
 
