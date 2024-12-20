@@ -50,7 +50,17 @@ void Show_Trials::receive() {
         file.open(WRITE);
         file.write(&content_to_show);
         file.close();
+        printf("File name: %s\n", file_name.c_str());
+        printf("File size: %s\n", file_size.c_str());
     }
+    else if (status == FIN){
+        this->client->setID("");
+        this->client->setGameTime("");
+        this->client->setTrials("0");
+        this->client->setWin(false);
+        this->client->setLose(false);
+    }
+
     else if (status == NOK) {
         // No games available for the player.
         printf("%s\n", string(NO_GAMES).c_str());

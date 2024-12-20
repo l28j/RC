@@ -46,6 +46,9 @@ void Scoreboard::receive() {
         file.open(WRITE);
         file.write(&content_to_show); // Write the Scoreboard to the file.
         file.close();
+        printf("File name: %s\n", file_name.c_str());
+        printf("File size: %s\n", file_size.c_str());
+        
     }
     else if (command == RSS && arguments[0] == EMPTY) {
         printf("%s\n", string(EMPTY_SCOREBOARD).c_str());
