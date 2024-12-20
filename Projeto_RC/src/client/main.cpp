@@ -1,55 +1,50 @@
-
 #include "main.hpp"
-
 #include <iostream>
 
 using namespace std;
 
-
 int main(int argc, char** argv) {
+    string serverIP = DEFAULT_IP; // Default server IP
+    int serverPort = DEFAULT_PORT; // Default server port
 
-    string serverIP = DEFAULT_IP;
-    int serverPort = DEFAULT_PORT;
-
-    for (int i = 0; i<argc; i++){
+    // Parse command-line arguments to set server IP and port
+    for (int i = 0; i < argc; i++) {
         string arg = argv[i];
 
         if (arg == IP_FLAG) {
-            serverIP = argv[i+1];
+            serverIP = argv[i + 1];
         } else if (arg == PORT_FLAG) {
-            serverPort = atoi(argv[i+1]);
+            serverPort = atoi(argv[i + 1]);
         }
     }
 
+    printf("Connecting to %s:%d\n", serverIP.c_str(), serverPort); // Display connection details
 
-    printf("Connecting to %s:%d\n", serverIP.c_str(), serverPort);
+    Client client = Client(); // Initialize the client
+    int exit = 0; // Exit flag for the main loop
 
-    Client client = Client();
-    
-    int exit = 0;
-    
-    while(!exit) {
-        printf("\n> ");
+    // Main loop for handling user input and executing commands
+    while (!exit) {
+        printf("\n> "); // Prompt for user input
 
         string input;
+        getline(cin, input); // Read input from the user
 
-        getline(cin, input);
-
-        Command* command;
+        Command* command = nullptr; // Pointer to the current command
 
         try {
-            command = CommandParser::parseCommand(input);
+            command = CommandParser::parseCommand(input); // Parse the input into a command
 
-            // There is no corresponding command for the input
-            // or the command format is invalid
-            if(command == nullptr) {
+            // If the command is invalid or not recognized, skip to the next iteration
+            if (command == nullptr) {
                 continue;
             }
 
+            // Set up the command with the server and client information
             command->setNetworkClient(serverIP, serverPort);
             command->setClient(&client);
-            
 
+            // Execute the command
             exit = command->execute();
         } catch (const CostumError& e) {
             printf("%s\n", e.what());
@@ -57,13 +52,16 @@ int main(int argc, char** argv) {
             printf("%s\n", string(UNKNOW_ERROR_MSG).c_str());
         }
 
-        if(command != nullptr) {
+        // Clean up the command object after execution
+        if (command != nullptr) {
             delete command;
         }
+
+        // Reset the client state if the game has ended
         if (client.isWin() || client.isLose()) {
             client.reset();
         }
-    }   
+    }
 
-    return 0;
+    return 0; // Exit the program
 }

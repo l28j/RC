@@ -5,292 +5,297 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>
 #include <dirent.h>
 
-void createGame(vector<string> arguments, string mode){
-
+// Creates a new game file for a player with the provided arguments and mode.
+void createGame(vector<string> arguments, string mode) {
     string dir_path = "src/server/_GAMES";
-
     namespace fs = std::filesystem;
 
-    if (!fs::exists(dir_path)){
+    // Create the directory if it doesn't exist.
+    if (!fs::exists(dir_path)) {
         fs::create_directory(dir_path);
     }
 
-    //Build path to the file
+    // Build the path to the game file.
     string path = dir_path + "/" + string("GAME") + "_" + arguments[0] + ".txt";
 
-    Fs file  = Fs(path);
-    
-    int error = file.open(WRITE);
+    Fs file = Fs(path);
 
-    if (error < 0){
+    // Open the file for writing.
+    int error = file.open(WRITE);
+    if (error < 0) {
         throw runtime_error("Failed to open file");
     }
 
-    //Write the game to the file
-    string data = arguments[0] + " " + mode + " " + arguments[1] + " " + arguments [2] + " " 
-                + arguments[3] + " " + arguments[4] + " " + " \n"; 
-
+    // Write game data to the file.
+    string data = arguments[0] + " " + mode + " " + arguments[1] + " " + arguments[2] + " " + 
+                  arguments[3] + " " + arguments[4] + " " + " \n";
 
     error = file.write(&data);
-
-    if (error < 0){
+    if (error < 0) {
         throw runtime_error("Failed to write to file");
     }
 
+    // Close the file.
     error = file.close();
-
-    if (error < 0){
+    if (error < 0) {
         throw runtime_error("Failed to close file");
     }
 }
 
-void endGame(string PLID, string status){
-    //Create Dir to this client
-
+// Ends a game for the specified player ID (PLID) and updates relevant files based on the status.
+void endGame(string PLID, string status) {
     string dir_path = "src/server/_GAMES/" + PLID + "/";
-
     namespace fs = std::filesystem;
-    if (!fs::exists(dir_path)){
+
+    // Create the directory for the player if it doesn't exist.
+    if (!fs::exists(dir_path)) {
         fs::create_directory(dir_path);
-        if (!fs::exists(dir_path)){
+        if (!fs::exists(dir_path)) {
             throw runtime_error("Failed to create directory");
         }
-    } 
+    }
 
-    //Set new path 
-    time_t full_time ;
+    // Generate a new file path with timestamp and status.
+    time_t full_time;
     struct tm* nowLocal;
-    string time_str = "";
+    string time_remaining = "";
+
+    secondsRemaining(PLID, &time_remaining);
     time(&full_time);
 
-    string time_reamining = "";
-
-    secondsRemaining(PLID, &time_reamining);
-    
     nowLocal = gmtime(&full_time);
     nowLocal->tm_year += 1900;
     nowLocal->tm_mon += 1;
 
-    string new_path = dir_path  
-    + to_string(nowLocal->tm_year) + to_string(nowLocal->tm_mon) + to_string(nowLocal->tm_mday) + "_" 
-    + to_string(nowLocal->tm_hour) + to_string(nowLocal->tm_min) + to_string(nowLocal->tm_sec) + "_"
-    + status + ".txt";
+    std::ostringstream oss1;
+    // Formats the values with zeros at the left if needed
+    oss1 << dir_path
+        << std::setw(4) << nowLocal->tm_year // Years
+        << std::setw(2) << std::setfill('0') << nowLocal->tm_mon // Months
+        << std::setw(2) << std::setfill('0') << nowLocal->tm_mday << "_" // Days
+        << std::setw(2) << std::setfill('0') << nowLocal->tm_hour // Hours
+        << std::setw(2) << std::setfill('0') << nowLocal->tm_min // MInutes
+        << std::setw(2) << std::setfill('0') << nowLocal->tm_sec << "_" // Seconds
+        << status << ".txt";
+    string new_path = oss1.str(); // Sets "new_path" with the new formated string
 
-    if (status == "W"){
-        //Update the scoreboard
+    // Update the scoreboard if the player has won.
+    if (status == "W") {
         string score_dir = "src/server/_SCORES/";
-        if (!fs::exists(score_dir)){
+        if (!fs::exists(score_dir)) {
             fs::create_directory(score_dir);
         }
 
-        string score_path = score_dir + "_" + PLID + to_string(nowLocal->tm_mday) + "_" + to_string(nowLocal->tm_mon) + "_" + to_string(nowLocal->tm_year)
-                            + "_" + to_string(nowLocal->tm_hour) + to_string(nowLocal->tm_min) + to_string(nowLocal->tm_sec) + ".txt";
-        
+        std::ostringstream oss2;
+        // Formats the values with zeros at the left if needed
+        oss2 << score_dir << "_" << PLID
+            << "_" << std::setw(2) << std::setfill('0') << nowLocal->tm_mday // Days
+            << "_" << std::setw(2) << std::setfill('0') << nowLocal->tm_mon  // Months
+            << "_" << std::setw(4) << nowLocal->tm_year                      // Years
+            << "_" << std::setw(2) << std::setfill('0') << nowLocal->tm_hour // Hours
+            << std::setw(2) << std::setfill('0') << nowLocal->tm_min         // Minutes
+            << std::setw(2) << std::setfill('0') << nowLocal->tm_sec         // Seconds
+            << ".txt";
+        string score_path = oss2.str(); // Sets "score_path" with the new formated string
+
         Fs file = Fs(score_path);
-
         int error = file.open(WRITE);
-
-        if (error < 0){
+        if (error < 0) {
             throw runtime_error("Failed to open file");
         }
 
         string trials = "";
-
         string score_str = "";
         string max_time = "";
-        string game_time = "";  
+        string game_time = "";
         string num_trials = "";
-        string secret_code = "";  
-        string game_mode = "";  
+        string secret_code = "";
+        string game_mode = "";
 
         getMaxTime(PLID, &max_time);
         getTrials(PLID, &trials, &num_trials);
         getSecretCode(PLID, &secret_code);
         getMode(PLID, &game_mode);
-        game_time = to_string(stoi(max_time) - stoi(time_reamining));
+        game_time = to_string(stoi(max_time) - stoi(time_remaining));
 
         int score_int = score(stoi(max_time), stoi(game_time), stoi(num_trials));
-
         score_str = to_string(score_int);
-        
-        game_mode == "P" ? game_mode = "PLAY" : game_mode = "DEBUG";
+        game_mode = (game_mode == "P") ? "PLAY" : "DEBUG";
 
-        string data = "";
- 
-        data = score_str + " " + PLID + " " + secret_code + " " + num_trials + " " + game_mode + "\n";
+        string data = score_str + " " + PLID + " " + secret_code + " " + num_trials + " " + game_mode + "\n";
         error = file.write(&data);
-
-        if (error < 0){
+        if (error < 0) {
             throw runtime_error("Failed to write to file");
         }
 
         error = file.close();
-
-        if (error < 0){
+        if (error < 0) {
             throw runtime_error("Failed to close file");
         }
     }
 
+    // Update the game file with the end time and status.
     Fs file = Fs("src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt");
-
- 
-    int error ;
+    int error;
 
     string max_time = "";
     getMaxTime(PLID, &max_time);
-    int game_time = stoi(max_time) - stoi(time_reamining);
+    int game_time = stoi(max_time) - stoi(time_remaining);
     string game_time_str = to_string(game_time);
-    
-    string end_line = to_string(nowLocal->tm_year) + "-" + to_string(nowLocal->tm_mon) + "-" + to_string(nowLocal->tm_mday) + " " 
-                    + to_string(nowLocal->tm_hour) + ":" + to_string(nowLocal->tm_min) + ":" + to_string(nowLocal->tm_sec) + " " + game_time_str + " \n";
+
+    std::ostringstream oss3;
+    // Places zeros at the left of each parameter if needed
+    oss3 << std::setw(4) << (nowLocal->tm_year) // Years
+        << "-" << std::setw(2) << std::setfill('0') << nowLocal->tm_mon // Months
+        << "-" << std::setw(2) << std::setfill('0') << nowLocal->tm_mday // Days
+        << " " << std::setw(2) << std::setfill('0') << nowLocal->tm_hour // Hours
+        << ":" << std::setw(2) << std::setfill('0') << nowLocal->tm_min  // Minutes
+        << ":" << std::setw(2) << std::setfill('0') << nowLocal->tm_sec  // Seconds
+        << " " << game_time_str << " \n";
+    std::string end_line = oss3.str(); // sets "end_line" with the new formated string
 
     error = file.open(WRITE);
-
-    if (error < 0){
+    if (error < 0) {
         throw runtime_error("Failed to open file");
     }
 
     error = file.writeOnNewLine(&end_line);
-    
-    if (error < 0){
+    if (error < 0) {
         throw runtime_error("Failed to write to file");
     }
 
     error = file.close();
-
-    if (error < 0){
+    if (error < 0) {
         throw runtime_error("Failed to close file");
     }
 
-    file.rename(&new_path); 
+    file.rename(&new_path); // Rename the game file with the new path.
 }
 
-int score(int max_time , int game_time , int num_trials){
+
+// Calculates the score based on max time, game time, and number of trials.
+int score(int max_time, int game_time, int num_trials) {
     int result = 100 * (0.4 * ((600.0 - max_time) / 600.0) +
-                          0.3 * ((max_time - game_time) / (float)max_time) +
-                          0.2 * ((8.0 - num_trials) / 8.0));
+                        0.3 * ((max_time - game_time) / (float)max_time) +
+                        0.2 * ((8.0 - num_trials) / 8.0));
     return result;
 }
 
+// Extracts the argument at the specified index from a space-separated string.
 string getArgument(string arguments, int index) {
-    // Split the arguments string into a vector of strings
     vector<string> args;
     stringstream ss(arguments);
     string arg;
+
+    // Split the arguments string into a vector of strings.
     while (getline(ss, arg, ' ')) {
         args.push_back(arg);
     }
 
-    // Return the argument at the specified index
+    // Return the argument at the specified index or an empty string if index is invalid.
     if (index < 0 || index >= static_cast<int>(args.size())) {
         return "";
     }
     return args[index];
 }
 
+// Retrieves the mode (e.g., PLAY or DEBUG) from the game file.
 void getMode(string PLID, string* mode) {
-    // Construir o caminho para o arquivo
     string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
-
     Fs file = Fs(path);
 
-    // Abrir o arquivo
+    // Open the file.
     int error = file.open(READ);
     if (error < 0) {
         throw runtime_error("Failed to open file");
     }
 
-    string first_line = "";
+    string first_line;
 
-    // Ler a primeira linha do arquivo
+    // Read the first line from the file.
     error = file.getFirstLine(&first_line);
-
     if (error < 0) {
         throw runtime_error("Failed to read from file");
     }
 
-    // Fechar o arquivo
+    // Close the file.
     error = file.close();
-
     if (error < 0) {
         throw runtime_error("Failed to close file");
     }
 
+    // Extract the mode argument from the first line.
     string mode_str = getArgument(first_line, 1);
-
     if (mode_str == "") {
         throw runtime_error("Failed to find the second argument in the first line");
     }
 
     *mode = mode_str;
-
 }
 
+// Retrieves the secret code from the game file.
 void getSecretCode(string PLID, string* secret_code) {
-    // Construir o caminho para o arquivo
     string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
-
     Fs file = Fs(path);
 
-    // Abrir o arquivo
+    // Open the file.
     int error = file.open(READ);
     if (error < 0) {
         throw runtime_error("Failed to open file");
     }
 
-    string first_line = "";
+    string first_line;
 
-    // Ler a primeira linha do arquivo
+    // Read the first line from the file.
     error = file.getFirstLine(&first_line);
     if (error < 0) {
         throw runtime_error("Failed to read from file");
     }
 
-    // Fechar o arquivo
+    // Close the file.
     error = file.close();
     if (error < 0) {
         throw runtime_error("Failed to close file");
     }
 
+    // Extract the secret code argument from the first line.
     string secret_code_str = getArgument(first_line, 2);
-
     if (secret_code_str == "") {
         throw runtime_error("Failed to find the third argument in the first line");
     }
 
     *secret_code = secret_code_str;
-
 }
 
+// Retrieves the game time and full timestamp from the game file.
 void getGameTime(string PLID, string* game_time) {
-    // Construir o caminho para o arquivo
     string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
-
     Fs file = Fs(path);
 
-    // Abrir o arquivo
+    // Open the file.
     int error = file.open(READ);
     if (error < 0) {
         throw runtime_error("Failed to open file");
     }
 
-    string first_line = "";
+    string first_line;
 
-    // Ler a primeira linha do arquivo
+    // Read the first line from the file.
     error = file.getFirstLine(&first_line);
     if (error < 0) {
         throw runtime_error("Failed to read from file");
     }
 
-    // Fechar o arquivo
+    // Close the file.
     error = file.close();
     if (error < 0) {
         throw runtime_error("Failed to close file");
     }
 
-    // Processar a linha para extrair o quarto argumento (tempo de jogo)
+    // Extract the game time and full timestamp arguments from the first line.
     string game_time_str = getArgument(first_line, 4);
     string full_time_str = getArgument(first_line, 5);
 
@@ -301,111 +306,107 @@ void getGameTime(string PLID, string* game_time) {
     *game_time = game_time_str + " " + full_time_str;
 }
 
-void getMaxTime(string PLID, string* max_time) {
-    // Construir o caminho para o arquivo
-    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
 
+// Retrieves the maximum game time from the game file.
+void getMaxTime(string PLID, string* max_time) {
+    string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
     Fs file = Fs(path);
 
-    // Abrir o arquivo
-
+    // Open the file.
     int error = file.open(READ);
     if (error < 0) {
         throw runtime_error("Failed to open file");
     }
 
-    string first_line = "";
+    string first_line;
 
-    // Ler a primeira linha do arquivo
+    // Read the first line from the file.
     error = file.getFirstLine(&first_line);
     if (error < 0) {
         throw runtime_error("Failed to read from file");
     }
 
-    // Fechar o arquivo
+    // Close the file.
     error = file.close();
     if (error < 0) {
         throw runtime_error("Failed to close file");
     }
 
+    // Extract the max time from the first line.
     string max_time_str = getArgument(first_line, 3);
-
     if (max_time_str == "") {
         throw runtime_error("Failed to find the second argument in the first line");
     }
 
     *max_time = max_time_str;
-
 }
 
+// Calculates the remaining seconds in the game.
 void secondsRemaining(string PLID, string* seconds) {
-    // Construir o caminho para o arquivo
     string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
-
     Fs file = Fs(path);
 
-    // Abrir o arquivo
+    // Open the file.
     int error = file.open(READ);
     if (error < 0) {
         throw runtime_error("Failed to open file");
     }
 
-    string first_line = "";
+    string first_line;
 
-    // Ler a primeira linha do arquivo
+    // Read the first line from the file.
     error = file.getFirstLine(&first_line);
     if (error < 0) {
         throw runtime_error("Failed to read from file");
     }
 
-    // Fechar o arquivo
+    // Close the file.
     error = file.close();
     if (error < 0) {
         throw runtime_error("Failed to close file");
     }
 
-    string max_time_str = getArgument(first_line, 3);   
+    // Extract max time and full timestamp from the first line.
+    string max_time_str = getArgument(first_line, 3);
     string full_time_str = getArgument(first_line, 6);
 
     if (max_time_str == "" || full_time_str == "") {
         throw runtime_error("Failed to find the fourth and fifth arguments in the first line");
     }
 
-    // Obter o tempo atual
+    // Calculate remaining time.
     time_t now = time(NULL);
-    // Calcular o tempo restante
     int remaining = stoi(max_time_str) - (now - stoi(full_time_str));
-    
+
     *seconds = to_string(remaining);
 }
 
-void getTrials(string PLID, string *trials , string *num_trials){
-    // Construir o caminho para o arquivo
+// Retrieves all trial details and counts the number of trials.
+void getTrials(string PLID, string* trials, string* num_trials) {
     string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
-
     Fs file = Fs(path);
 
-    // Abrir o arquivo
+    // Open the file.
     int error = file.open(READ);
     if (error < 0) {
         throw runtime_error("Failed to open file");
     }
 
-    string data = "";
-    
-    // Ler o arquivo
+    string data;
+
+    // Read the file contents.
     error = file.read(&data);
     if (error < 0) {
         throw runtime_error("Failed to read from file");
     }
 
-    // Fechar o arquivo
+    // Close the file.
     error = file.close();
     if (error < 0) {
         throw runtime_error("Failed to close file");
     }
 
-    // Ignorar a primeira linha
+    // Ignore the first line.
     size_t pos = data.find("\n");
     if (pos == string::npos) {
         throw runtime_error("Failed to find the first newline character");
@@ -413,7 +414,7 @@ void getTrials(string PLID, string *trials , string *num_trials){
     data = data.substr(pos + 1);
     string temp = data;
 
-    // Contar o número de tentativas
+    // Count the number of trials.
     int count = 0;
     pos = temp.find("\n");
     while (pos != string::npos) {
@@ -422,63 +423,63 @@ void getTrials(string PLID, string *trials , string *num_trials){
         pos = temp.find("\n");
     }
 
-    *trials = data;
-    *num_trials = to_string(count); 
+    *trials = data; // Store all trials as a single string.
+    *num_trials = to_string(count); // Store the count of trials.
 }
 
-int canPlay(string PLID){
-    //Build path to the file
+// Checks if the player can continue playing the game.
+int canPlay(string PLID) {
     string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
-
     namespace fs = std::filesystem;
 
-    if (!fs::exists(path)){
+    // Check if the game file exists.
+    if (!fs::exists(path)) {
         return 0;
     }
 
-    string time_remaining = "";
-
+    string time_remaining;
     secondsRemaining(PLID, &time_remaining);
-    
-    if (stoi(time_remaining) <= 0){
+
+    // Check if time remaining is greater than zero.
+    if (stoi(time_remaining) <= 0) {
         return 0;
     }
 
     return 1;
 }
 
-int playerISPlaying(string PLID){
-    //Build path to the file
+// Checks if a player currently has an active game.
+int playerISPlaying(string PLID) {
     string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
-
     namespace fs = std::filesystem;
 
-    if (!fs::exists(path)){
-        return 0;
-    }
-
-    return 1;
+    // Return true if the game file exists, false otherwise.
+    return fs::exists(path) ? 1 : 0;
 }
 
-int isDup(string PLID, vector<string> content){
-    
-    //Verify if there is any trial
-    int dup_flag=0;
+
+// Checks if the current trial is a duplicate of previous ones.
+int isDup(string PLID, vector<string> content) {
+    int dup_flag = 0;
     string trials = "";
     string n_trials = "";
-    vector<string> secret_codes ;
 
+    // Retrieve all trials and their count.
     getTrials(PLID, &trials, &n_trials);
 
-    if (n_trials == "0"){
+    // If there are no trials, return no duplicate.
+    if (n_trials == "0") {
         return 0;
     }
-    string conbined_content = content[0] + content[1] + content[2] + content[3];
 
-    for (int i = 0; i < stoi(n_trials); i++){
+    // Combine the content into a single string.
+    string combined_content = content[0] + content[1] + content[2] + content[3];
+
+    // Iterate over each trial.
+    for (int i = 0; i < stoi(n_trials); i++) {
         string trial = "";
         size_t pos = trials.find("\n");
-        if (pos == string::npos){
+        if (pos == string::npos) {
             throw runtime_error("Failed to find the first newline character");
         }
         trial = trials.substr(0, pos);
@@ -486,42 +487,46 @@ int isDup(string PLID, vector<string> content){
 
         string code = getArgument(trial, 1);
 
-        if (conbined_content == code){
-            if(i==stoi(n_trials)-1)
-                return 2;
-            else
-                dup_flag=1;
+        if (combined_content == code) {
+            if (i == stoi(n_trials) - 1) {
+                return 2; // Exact duplicate of the most recent trial.
+            } else {
+                dup_flag = 1; // Duplicate exists but not the most recent.
+            }
         }
     }
-    if(dup_flag==1)
-        return 1;
-    return 0;
+
+    return dup_flag == 1 ? 1 : 0;
 }
 
-int checkTrial(string PLID, string trial){
+// Verifies the validity of the trial number against the game's trial count.
+int checkTrial(string PLID, string trial) {
     string trials = "";
     string num_trials = "";
 
+    // Retrieve all trials and their count.
     getTrials(PLID, &trials, &num_trials);
 
-    if(stoi(trial) == stoi(num_trials)){
-        return 2;
+    if (stoi(trial) == stoi(num_trials)) {
+        return 2; // Trial matches the most recent.
     }
 
-    if (stoi(trial) == stoi(num_trials) + 1){
-        return 1;
+    if (stoi(trial) == stoi(num_trials) + 1) {
+        return 1; // Trial is valid as the next expected trial.
     }
 
-    return 0;
+    return 0; // Invalid trial.
 }
 
-void compare_code(string secret_code, string trial, int *corrects, int *wrongs) {
+// Compares the player's trial against the secret code.
+void compare_code(string secret_code, string trial, int* corrects, int* wrongs) {
     *corrects = 0;
     *wrongs = 0;
 
     vector<bool> matched_secret(4, false); 
     vector<bool> matched_trial(4, false); 
 
+    // Check for correct positions.
     for (int i = 0; i < 4; i++) {
         if (secret_code[i] == trial[i]) {
             (*corrects)++;
@@ -530,6 +535,7 @@ void compare_code(string secret_code, string trial, int *corrects, int *wrongs) 
         }
     }
 
+    // Check for correct colors in wrong positions.
     for (int i = 0; i < 4; i++) {
         if (!matched_trial[i]) { 
             for (int j = 0; j < 4; j++) {
@@ -543,88 +549,84 @@ void compare_code(string secret_code, string trial, int *corrects, int *wrongs) 
     }
 }
 
-void try_command(string PLID , vector<string> colors, string numberTry, string* status, string* data){
+// Executes a player's trial and updates the game state accordingly.
+void try_command(string PLID, vector<string> colors, string numberTry, string* status, string* data) {
     string secret_code = "";
-    string end_code = "";
     getSecretCode(PLID, &secret_code);
 
-    if (secret_code == ""){
+    if (secret_code == "") {
         throw runtime_error("Failed to get secret code");
     }
 
     string str_content = colors[0] + colors[1] + colors[2] + colors[3];
 
-    string corrects = "";
-    string wrongs = "";
-
     int corrects_int = 0;
     int wrongs_int = 0;
 
+    // Compare the trial with the secret code.
     compare_code(secret_code, str_content, &corrects_int, &wrongs_int);
 
-    corrects = to_string(corrects_int);
-    wrongs = to_string(wrongs_int);
+    string corrects = to_string(corrects_int);
+    string wrongs = to_string(wrongs_int);
 
-    if (corrects_int != 4 && numberTry == "8"){
+    // Determine the trial outcome.
+    string end_code = "";
+    if (corrects_int != 4 && numberTry == "8") {
         *status = "ENT";
-        end_code = "F"; 
-    }
-    else if(corrects_int == 4){
+        end_code = "F"; // Game over, maximum attempts reached.
+    } else if (corrects_int == 4) {
         *status = "OK";
-        end_code = "W";
+        end_code = "W"; // Player wins.
+    } else {
+        *status = "OK"; // Trial is valid but game continues.
     }
-    else{
-        *status = "OK";
-    }
-        
+
     string time_remaining = "";
     string max_time = "";
-    
     secondsRemaining(PLID, &time_remaining);
     getMaxTime(PLID, &max_time);
 
     string seconds = to_string(stoi(max_time) - stoi(time_remaining));
 
+    // Format the trial entry.
     string trial = "T: " + str_content + " " + corrects + " " + wrongs + " " + seconds + " \n";
 
-    //Build path to the file
     string path = "src/server/_GAMES/" + string("GAME") + "_" + PLID + ".txt";
-
     Fs file = Fs(path);
 
-    // Abrir o arquivo
+    // Open the game file.
     int error = file.open(WRITE);
     if (error < 0) {
         throw runtime_error("Failed to open file");
     }
 
-    // Escrever a tentativa no arquivo
+    // Write the trial data to the game file.
     error = file.writeOnNewLine(&trial);
     if (error < 0) {
         throw runtime_error("Failed to write to file");
     }
 
-    // Fechar o arquivo
+    // Close the game file.
     error = file.close();
     if (error < 0) {
         throw runtime_error("Failed to close file");
     }
-    *data = "";  
 
+    // Prepare the response data.
+    *data = "";
     if (*status == "OK") {
         *data = numberTry + " " + corrects + " " + wrongs;
     } else {
         for (int i = 0; i < 4; i++) {
-            *data +=  std::string(1, secret_code[i]) + " ";
+            *data += std::string(1, secret_code[i]) + " ";
         }
     }
 
-    if (end_code != ""){
+    // End the game if necessary.
+    if (end_code != "") {
         endGame(PLID, end_code);
     }
-    
 }
-
 
 
 int findTopScores(SCORELIST *list){

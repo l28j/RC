@@ -4,7 +4,7 @@
 
 #define MAX_MESSAGE_SIZE 1024
 
-
+// Constructor: Initializes the UDP client with the given IP and port.
 UdpClient::UdpClient(string ip, int port) {
     this->serverIP = ip;
     this->serverPort = port;
@@ -16,40 +16,40 @@ UdpClient::UdpClient(string ip, int port) {
 
     int status = getaddrinfo(this->serverIP.c_str(), std::to_string(this->serverPort).c_str(), &hints, &res);
     if (status != 0) {
-        throw ConnectionSetupError();
+        throw ConnectionSetupError(); // Handle address resolution errors.
     }
 
     this->sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (this->sockfd < 0) {
-        freeaddrinfo(res);
+        freeaddrinfo(res); // Free resources in case of error.
         throw ConnectionSetupError();
     }
     
     memcpy(&this->serverAddr, res->ai_addr, res->ai_addrlen);
 
-    freeaddrinfo(res);
+    freeaddrinfo(res); // Free resources after successful setup.
 }
 
-    
-
+// Sends data to the server via UDP.
 int UdpClient::sendData(const string& data) {
-   
     int n = sendto(this->sockfd, data.c_str(), data.length(), 0, (struct sockaddr*) &this->serverAddr, sizeof(this->serverAddr));
 
-    if(n < 0) {
-        throw ConnectionFailedError();
+    if (n < 0) {
+        throw ConnectionFailedError(); // Handle errors during data transmission.
     }
 
-    return n;
+    return n; // Return the number of bytes sent.
 }
 
+// Receives data from the server via UDP.
 string UdpClient::receiveData() {
     struct timeval timeout;
-    timeout.tv_sec = TIMEOUT_SECONDS;
-    timeout.tv_usec = TIMEOUT_MICROSECONDS;   
+    timeout.tv_sec = TIMEOUT_SECONDS; // Set receive timeout (seconds).
+    timeout.tv_usec = TIMEOUT_MICROSECONDS; // Set receive timeout (microseconds).
 
+    // Apply the timeout settings to the socket.
     if (setsockopt(this->sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
-        throw std::runtime_error("Failed to set socket timeout");
+        throw std::runtime_error("Failed to set socket timeout"); // Handle socket option errors.
     }
 
     char buffer[MAX_MESSAGE_SIZE];
@@ -58,15 +58,15 @@ string UdpClient::receiveData() {
 
     if (n < 0) {
         if (errno == EWOULDBLOCK || errno == EAGAIN) {
-            throw std::runtime_error("Connection Timed out. Please try again!");
+            throw std::runtime_error("Connection Timed out. Please try again!"); // Handle timeout errors.
         } else {
-            throw ConnectionFailedError();
+            throw ConnectionFailedError(); // Handle other reception errors.
         }
     }
 
-    // Remove the newline character if present
-    buffer[n-1] = '\0';
+    // Remove the newline character if present.
+    buffer[n - 1] = '\0';
 
     string dataReceived = string(buffer);
-    return dataReceived;
+    return dataReceived; // Return the received data.
 }

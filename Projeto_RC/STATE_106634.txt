@@ -1,12 +1,12 @@
  	Active game found for player 106634
-Game initiated: 2024-12-19 20:50:6 with 200 seconds to be completed
+Game initiated: 2024-12-20 00:29:11 with 200 seconds to be completed
 
-	--- Transactions found: 0 ---
+	--- Transactions found: 3 ---
 
+T: RRRR 1 0 47 
+T: YYYY 0 0 50 
+T: OOOO 0 0 53 
 
- -- 198 seconds remaining to be completed --
-
- -- 182 seconds remaining to be completed --
-
--- 163 seconds remaining to be completed --
+ -- 143 seconds remaining to be completed --
+ 163 seconds remaining to be completed --
  completed --

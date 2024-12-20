@@ -15,6 +15,4 @@ class Scoreboard : public Command {
         string formatData();
 };
 
-
-
 #endif

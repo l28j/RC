@@ -1,9 +1,7 @@
  	--- Current Scoreboard (TOP10) ---
 01   068   102324   GYPO   2   PLAY
-02   062   106634   YROB   2   PLAY
-
-
-3   059   106634   BYOP   6   PLAY
+02   066   106634   RBBB   3   DEBUG
+03   062   106634   YROB   2   PLAY
 04   000   232392   RBOP   4   PLAY
 05   000   202382   GPRO   2   PLAY
 06   000   106634   OBGR   4   PLAY
