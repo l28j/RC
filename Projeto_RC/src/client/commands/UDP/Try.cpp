@@ -68,7 +68,7 @@ void Try::receive() {
             throw ServerResponseError();
         } else {
             printf("%s\n", string(GAME_OVER).c_str()); // Notify game over.
-            printf("Secret: %s %s %s %s\n", arguments[1].c_str(), arguments[2].c_str(), arguments[3].c_str(), arguments[4].c_str());
+            printf("Secret code: %s %s %s %s\n", arguments[1].c_str(), arguments[2].c_str(), arguments[3].c_str(), arguments[4].c_str());
             this->client->setLose(true);
         }
     } else if (status == NOK) {
