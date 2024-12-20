@@ -2,17 +2,18 @@
 
 #include <sys/stat.h>
 
+// Gets the file path defined in the constructor
 string Fs::getPath() {
     return this->path;
 }
 
 /**
- * @brief opens file defined in constructor
+ * @brief Opens the file defined in the constructor.
  * @param mode READ or WRITE
  * @return int 0 if success, -1 if error
  */
 int Fs::open(int mode) {
-    // Isto nao consegue abrir o ficheiro dentro de uma pasta
+    // Cannot open a file inside a folder without ensuring the folder exists
     if(mode == READ){
         this->fd = ::open(this->path.c_str(), O_RDONLY, 0644);
     }
@@ -31,7 +32,7 @@ int Fs::open(int mode) {
 }
 
 /**
- * @brief Closes file defined in constructor
+ * @brief Closes the file defined in the constructor.
  * @return int 0 if success, -1 if error
  */
 int Fs::close() {
@@ -45,17 +46,17 @@ int Fs::close() {
 }
 
 /**
- * @brief Checks if file defined in constructor is open
- * @return true if file is open
- * @return false if file is not open
+ * @brief Checks if the file defined in the constructor is open.
+ * @return true if the file is open
+ * @return false if the file is not open
  */
 bool Fs::isOpen() {
     return this->fd != -1;
 }
 
 /**
- * @brief Writes data to file defined in constructor
- * @param data string pointer to data to be written to file
+ * @brief Writes data to the file defined in the constructor.
+ * @param data string pointer to data to be written to the file
  * @return int 0 if success, -1 if error
  */
 int Fs::write(string* data) {
@@ -71,8 +72,7 @@ int Fs::write(string* data) {
 }
 
 /**
- * @brief returns size of file in bytes
- * 
+ * @brief Returns the size of the file in bytes.
  * @return int -1 if error, else file size in bytes
  */
 int Fs::getSize() {
@@ -80,23 +80,22 @@ int Fs::getSize() {
         return -1;
     }
 
-    // set file pointer to beginning of file
+    // Move file pointer to the beginning of the file
     lseek(this->fd, 0, SEEK_SET);
 
-    size_t size = lseek(this->fd, 0, SEEK_END);
+    size_t size = lseek(this->fd, 0, SEEK_END); // Calculate the file size
 
-    // set file pointer to beginning of file
+    // Reset file pointer to the beginning of the file
     lseek(this->fd, 0, SEEK_SET);
 
     return static_cast<int>(size);
 }
 
 /**
- * @brief Reads first line of file defined in constructor
- * @param data string pointer to store first line of file
+ * @brief Reads the first line of the file defined in the constructor.
+ * @param data string pointer to store the first line of the file
  * @return int 0 if success, -1 if error
  */
-
 int Fs::getFirstLine(string* data) {
     if(!isOpen()) {
         return -1;
@@ -110,7 +109,7 @@ int Fs::getFirstLine(string* data) {
 
     char buffer[size];
 
-    // set file pointer to beginning of file
+    // Set file pointer to the beginning of the file
     lseek(this->fd, 0, SEEK_SET);
 
     ssize_t bytesRead = ::read(this->fd, buffer, size);
@@ -127,16 +126,17 @@ int Fs::getFirstLine(string* data) {
         return -1;
     }
 
-    *data = str.substr(0, pos);
+    *data = str.substr(0, pos); // Extract the first line
 
     return 0;
 }
 
-/** 
- * @brief Reads the last line of the file
+
+/**
+ * @brief Reads the last line of the file.
  * @param data string pointer to store the last line of the file
  * @return int 0 if success, -1 if error
- */
+ **/
 int Fs::getLastLine(string* data) {
     if (!isOpen()) {
         return -1;
@@ -161,51 +161,50 @@ int Fs::getLastLine(string* data) {
 
     string str(buffer, bytesRead);
 
-    // Localizar o último `\n`
+    // Locate the last `\n`
     size_t lastPos = str.find_last_of("\n");
     if (lastPos == string::npos) {
-        return -1; // Nenhuma quebra de linha encontrada
+        return -1; // No newline found
     }
 
-    // Localizar o penúltimo `\n`
+    // Locate the penultimate `\n`
     size_t penultimatePos = str.find_last_of("\n", lastPos - 1);
 
     if (penultimatePos == string::npos) {
-        // Apenas uma linha no arquivo (ou duas linhas sem conteúdo antes do primeiro `\n`)
-        *data = str.substr(0, lastPos); // Retorna tudo antes do último `\n`
+        // Only one line in the file
+        *data = str.substr(0, lastPos);
     } else {
-        // Há pelo menos duas linhas no arquivo
+        // Extract the last line
         *data = str.substr(penultimatePos + 1, lastPos - penultimatePos - 1);
     }
 
     return 0;
 }
 
-
 /**
- * @brief Reads data from file defined in constructor
- * @param data string pointer to store data read from file
+ * @brief Reads data from the file defined in the constructor.
+ * @param data string pointer to store data read from the file
  * @return int 0 if success, -1 if error
  */
 int Fs::read(string* data) {
-    if(!isOpen()) {
+    if (!isOpen()) {
         return -1;
     }
 
     int size = getSize();
 
-    if(size <= 0) {
+    if (size <= 0) {
         return -1;
     }
 
     char buffer[size];
 
-    // set file pointer to beginning of file
+    // Set file pointer to the beginning of the file
     lseek(this->fd, 0, SEEK_SET);
 
     ssize_t bytesRead = ::read(this->fd, buffer, size);
 
-    if(bytesRead < 0) {
+    if (bytesRead < 0) {
         return -1;
     }
 
@@ -215,8 +214,8 @@ int Fs::read(string* data) {
 }
 
 /**
- * @brief Writes data to file defined in constructor on a new line
- * @param data string pointer to data to be written to file
+ * @brief Writes data to the file defined in the constructor on a new line.
+ * @param data string pointer to data to be written to the file
  * @return int 0 if success, -1 if error
  */
 int Fs::writeOnNewLine(string* data) {
@@ -229,7 +228,7 @@ int Fs::writeOnNewLine(string* data) {
         return -1;
     }
 
-    std::string dataWithNewline = data->c_str();
+    std::string dataWithNewline = *data;
     if (dataWithNewline.back() != '\n') {
         dataWithNewline += '\n'; // Add newline if not already present
     }
@@ -241,13 +240,17 @@ int Fs::writeOnNewLine(string* data) {
     return 0;
 }
 
+/**
+ * @brief Renames the file to a new path.
+ * @param newpath string pointer to the new path
+ * @return int 0 if success, -1 if error
+ */
 int Fs::rename(string* newpath) {
-
     if (isOpen()) {
         throw runtime_error("Cannot move an open file. Close the file first.");
     }
 
-    std::string newpath_str = newpath->c_str();
+    std::string newpath_str = *newpath;
     if (::rename(this->path.c_str(), newpath_str.c_str()) != 0) {
         return -1;
     }

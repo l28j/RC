@@ -20,13 +20,11 @@ public:
     void enqueue(Command* command);
 
 private:
-    int threadsNumber;
-
+    int n_threads;
+    mutex mutex_q;
+    condition_variable condition;
     vector<thread> workers;
     queue<Command*> commands;
-
-    mutex queue_mutex;
-    condition_variable condition;
 };
 
-#endif // SERVER_THREADPOOL_HPP
+#endif

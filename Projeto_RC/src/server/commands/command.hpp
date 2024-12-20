@@ -22,14 +22,15 @@ using namespace std;
 class Command {
 protected:
   unique_ptr<Socket> socket;
-  string socketType;
   string returnCode;
   string status = "";
+  string socketType;
 
 public:
   virtual void execute() = 0; //needs to be implemented by the child class
 
   void send(string status);
+
   void setupSocketConnection(int port, bool verbose, int socketfd, struct sockaddr_in serverInfo, struct sockaddr_in clientInfo);
 };
 

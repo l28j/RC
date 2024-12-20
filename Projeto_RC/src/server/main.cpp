@@ -1,13 +1,13 @@
 #include "main.hpp"
 
 void runUdpMonitor(ThreadPool* threadPool, int port, bool verbose){
-  printf("Starting udp monitor on port %d %s verbose mode\n", port, verbose ? "with" : "without");
   UdpSocket udpMonitor = UdpSocket(port, verbose);
+  printf("Starting udp monitor on port %d %s verbose mode\n", port, verbose ? "with" : "without");
 
   while (true){
-    string receivedData = udpMonitor.receiveData();
+    string received_data = udpMonitor.receiveData();
 
-    Command *command = CommandFactory::createCommand(receivedData);
+    Command *command = CommandFactory::createCommand(received_data);
     if (command == nullptr) {
       udpMonitor.sendData(ERR);
       continue;
@@ -15,8 +15,8 @@ void runUdpMonitor(ThreadPool* threadPool, int port, bool verbose){
 
     //set up the socket connection for the command
     command->setupSocketConnection(
-      port, 
       verbose, 
+      port, 
       udpMonitor.getCommandSocketfd(),
       udpMonitor.getServerInfo(),
       udpMonitor.getClientInfo()
@@ -28,14 +28,14 @@ void runUdpMonitor(ThreadPool* threadPool, int port, bool verbose){
 
 void runTcpMonitor(ThreadPool* threadPool, int port, bool verbose){
   printf("Starting tcp monitor on port %d %s verbose mode\n", port, verbose ? "with" : "without");
-  TcpSocket tcpMonitor = TcpSocket(port, verbose);
+  TcpSocket tcp_monitor = TcpSocket(port, verbose);
 
   while (true){
-    string receivedData = tcpMonitor.receiveData();
+    string received_data = tcp_monitor.receiveData();
 
-    Command *command = CommandFactory::createCommand(receivedData);
+    Command *command = CommandFactory::createCommand(received_data);
     if (command == nullptr) {
-      tcpMonitor.sendData(ERR);
+      tcp_monitor.sendData(ERR);
       continue;
     }
 
@@ -43,9 +43,9 @@ void runTcpMonitor(ThreadPool* threadPool, int port, bool verbose){
     command->setupSocketConnection(
       port, 
       verbose, 
-      tcpMonitor.getCommandSocketfd(),
-      tcpMonitor.getServerInfo(),
-      tcpMonitor.getClientInfo()
+      tcp_monitor.getCommandSocketfd(),
+      tcp_monitor.getServerInfo(),
+      tcp_monitor.getClientInfo()
     );
 
     threadPool->enqueue(command);
@@ -71,12 +71,12 @@ int main(int argc, char **argv){
   ThreadPool threadPool = ThreadPool();
 
   // run each monitor in a separate thread
-  thread udpMonitorThread(runUdpMonitor, &threadPool, port, verbose);
-  thread tcpMonitorThread(runTcpMonitor, &threadPool, port, verbose);
+  thread udp_monitor_thread(runUdpMonitor, &threadPool, port, verbose);
+  thread tcp_monitor_thread(runTcpMonitor, &threadPool, port, verbose);
 
   printf("Waiting for monitors to finish\n");
-  udpMonitorThread.join();
-  tcpMonitorThread.join();
+  udp_monitor_thread.join();
+  tcp_monitor_thread.join();
 
   return 0;
 }

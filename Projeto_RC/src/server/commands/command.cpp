@@ -11,9 +11,9 @@ void Command::setupSocketConnection(int port, bool verbose, int socketfd, struct
 }
 
 void Command::send(string status){
-  string response = string(this->returnCode) + " " + status + "\n";
+  string response_message = string(this->returnCode) + " " + status + "\n";
 
-  this->socket->sendData(response);
+  this->socket->sendData(response_message);
 
   if (this->socketType == "TCP"){ //tcp commands have a unique socket connection for communication
     close(this->socket->getCommandSocketfd());

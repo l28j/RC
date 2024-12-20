@@ -129,7 +129,7 @@ void Show_Trials::execute(){
     data += "Game initiated: ";
 
     // Path to the game file for the player.
-    string path = "src/server/_GAMES/" + string("GAME") + "_" + this->PLID + ".txt";
+    string path = "src/server/GAMES/" + string("GAME") + "_" + this->PLID + ".txt";
     Fs file = Fs(path);
 
     // Open the game file to retrieve details.
