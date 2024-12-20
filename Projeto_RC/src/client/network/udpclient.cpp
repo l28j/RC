@@ -52,9 +52,9 @@ string UdpClient::receiveData() {
         throw std::runtime_error("Failed to set socket timeout"); // Handle socket option errors.
     }
 
-    char buffer[MAX_MESSAGE_SIZE];
+    char buffer[MAX_UDP_MESSAGE];
     socklen_t len = sizeof(this->serverAddr);
-    int n = recvfrom(this->sockfd, buffer, MAX_MESSAGE_SIZE, 0, (struct sockaddr*)&this->serverAddr, &len);
+    int n = recvfrom(this->sockfd, buffer, MAX_UDP_MESSAGE, 0, (struct sockaddr*)&this->serverAddr, &len);
 
     if (n < 0) {
         if (errno == EWOULDBLOCK || errno == EAGAIN) {

@@ -2,7 +2,6 @@
 
 // Constructor: Initializes the Debug object with arguments and sets initial parameters.
 Debug::Debug(vector<string> args) {
-    printf("Debug command\n");
     this->socketType = "UDP";
     this->returnCode = RDB;
 

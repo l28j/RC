@@ -1,54 +1,60 @@
 #include "threadPool.hpp"
-ThreadPool::ThreadPool() {
+
+ThreadPool::ThreadPool(){
     this->threadsNumber = thread::hardware_concurrency();
 
-    for (int i = 0; i < this->threadsNumber; i++) {
+    for(int i = 0; i < this->threadsNumber; i++){
+        // emplace_back() constructs the thread in-place
         this->workers.emplace_back(
-            [this]() {
-                while (true) {
-                    std::unique_ptr<Command> command;
+            [this](){
+                while(true){
+                    Command* command;
                     {
-                        std::unique_lock<std::mutex> lock(this->queue_mutex);
+                        unique_lock<mutex> lock(this->queue_mutex);
 
-                        this->condition.wait(lock, [this]() {
+                        // wait until lock is acquired and queue is not empty
+                        this->condition.wait(lock, [this](){
+                            // only moves if this condition is true
                             return !this->commands.empty();
                         });
 
-                        command = std::move(this->commands.front());
+                        // returns first element of queue
+                        command = this->commands.front();
+                        // removes first element of queue
                         this->commands.pop();
 
-                        if (!command) {
+                        // nullptr is used to stop threads
+                        if(command == nullptr){
                             break;
                         }
-                    }
+                    } // lock is released here
 
-                    command->execute(); // Executa o comando
+                    command->execute();
                 }
             }
         );
     }
 }
 
-
-ThreadPool::~ThreadPool() {
-    for (int i = 0; i < this->threadsNumber; i++) {
-        // Enfileira nullptr (smart pointer vazio) para sinalizar o término
+ThreadPool::~ThreadPool(){
+    for(int i = 0; i < this->threadsNumber; i++){
+        // enqueue nullptr to stop threads
         this->enqueue(nullptr);
     }
 
-    for (auto& worker : this->workers) {
-        if (worker.joinable()) {
-            worker.join();
-        }
+    for(int i = 0; i < this->threadsNumber; i++){
+        // wait for all threads to finish
+        if(this->workers[i].joinable()) this->workers[i].join();
     }
 }
 
-
-void ThreadPool::enqueue(std::unique_ptr<Command> command) {
+void ThreadPool::enqueue(Command* command){
     {
-        std::unique_lock<std::mutex> lock(queue_mutex);
-        commands.push(std::move(command)); // Mover para a fila
-    }
+        unique_lock<mutex> lock(queue_mutex);
+        commands.push(command);
+    } // lock is released here
 
-    condition.notify_one(); // Notificar uma thread
+    // notify one thread that there is a new command
+    // notify_all() would wake up all threads, but only one is needed
+    condition.notify_one();
 }

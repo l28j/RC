@@ -17,13 +17,13 @@ public:
     ThreadPool();
     ~ThreadPool();
 
-    void enqueue(std::unique_ptr<Command> command);
+    void enqueue(Command* command);
 
 private:
     int threadsNumber;
 
     vector<thread> workers;
-    queue<std::unique_ptr<Command>> commands;
+    queue<Command*> commands;
 
     mutex queue_mutex;
     condition_variable condition;

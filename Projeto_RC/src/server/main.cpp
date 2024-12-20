@@ -1,96 +1,82 @@
 #include "main.hpp"
 
-// Function to run the UDP monitor, handling incoming UDP requests.
-void runUdpMonitor(ThreadPool* threadPool, int port, bool verbose) {
-    printf("Starting udp monitor on port %d %s verbose mode\n", port, verbose ? "with" : "without");
-    UdpSocket udpMonitor = UdpSocket(port, verbose); // Initialize the UDP monitor socket.
+void runUdpMonitor(ThreadPool* threadPool, int port, bool verbose){
+  printf("Starting udp monitor on port %d %s verbose mode\n", port, verbose ? "with" : "without");
+  UdpSocket udpMonitor = UdpSocket(port, verbose);
 
-    while (true) {
-        // Receive data from the UDP socket.
-        string receivedData = udpMonitor.receiveData();
+  while (true){
+    string receivedData = udpMonitor.receiveData();
 
-        // Create a Command object from the received data.
-        std::unique_ptr<Command> command = CommandFactory::createCommand(receivedData);
-        if (command == nullptr) {
-            udpMonitor.sendData(ERR); // Send error response if the command is invalid.
-            continue;
-        }
-
-        // Use o comando (o `std::unique_ptr` cuida da liberação automática de memória)
-        command->execute();
-
-
-        // Set up the socket connection for the command.
-        command->setupSocketConnection(
-            port,
-            verbose,
-            udpMonitor.getCommandSocketfd(),
-            udpMonitor.getServerInfo(),
-            udpMonitor.getClientInfo()
-        );
-
-        // Enqueue the command into the thread pool for execution.
-        threadPool->enqueue(std::move(command));
+    Command *command = CommandFactory::createCommand(receivedData);
+    if (command == nullptr) {
+      udpMonitor.sendData(ERR);
+      continue;
     }
+
+    //set up the socket connection for the command
+    command->setupSocketConnection(
+      port, 
+      verbose, 
+      udpMonitor.getCommandSocketfd(),
+      udpMonitor.getServerInfo(),
+      udpMonitor.getClientInfo()
+    );
+
+    threadPool->enqueue(command);
+  }
 }
 
-// Function to run the TCP monitor, handling incoming TCP requests.
-void runTcpMonitor(ThreadPool* threadPool, int port, bool verbose) {
-    printf("Starting tcp monitor on port %d %s verbose mode\n", port, verbose ? "with" : "without");
-    TcpSocket tcpMonitor = TcpSocket(port, verbose); // Initialize the TCP monitor socket.
+void runTcpMonitor(ThreadPool* threadPool, int port, bool verbose){
+  printf("Starting tcp monitor on port %d %s verbose mode\n", port, verbose ? "with" : "without");
+  TcpSocket tcpMonitor = TcpSocket(port, verbose);
 
-    while (true) {
-        // Receive data from the TCP socket.
-        string receivedData = tcpMonitor.receiveData();
+  while (true){
+    string receivedData = tcpMonitor.receiveData();
 
-        // Create a Command object from the received data.
-        std::unique_ptr<Command> command = CommandFactory::createCommand(receivedData);
-        if (command == nullptr) {
-            tcpMonitor.sendData(ERR); // Send error response if the command is invalid
-            continue;
-        }
-
-        // Set up the socket connection for the command.
-        command->setupSocketConnection(
-            port,
-            verbose,
-            tcpMonitor.getCommandSocketfd(),
-            tcpMonitor.getServerInfo(),
-            tcpMonitor.getClientInfo()
-        );
-
-        // Enqueue the command into the thread pool for execution.
-        threadPool->enqueue(std::move(command));
+    Command *command = CommandFactory::createCommand(receivedData);
+    if (command == nullptr) {
+      tcpMonitor.sendData(ERR);
+      continue;
     }
+
+    //set up the socket connection for the command
+    command->setupSocketConnection(
+      port, 
+      verbose, 
+      tcpMonitor.getCommandSocketfd(),
+      tcpMonitor.getServerInfo(),
+      tcpMonitor.getClientInfo()
+    );
+
+    threadPool->enqueue(command);
+  }
 }
 
-// Main function to initialize and run the UDP and TCP monitors.
-int main(int argc, char** argv) {
-    int port = DEFAULT_PORT; // Default port for the server.
-    bool verbose = DEFAULT_VERBOSE; // Default verbosity setting.
+int main(int argc, char **argv){
+  int port = DEFAULT_PORT;
+  bool verbose = DEFAULT_VERBOSE;
 
-    // Parse command-line arguments.
-    for (int i = 0; i < argc; i++) {
-        string arg = argv[i];
+  for (int i = 0; i < argc; i++){
+    string arg = argv[i];
 
-        if (arg == PORT_FLAG) {
-            port = atoi(argv[i + 1]); // Set the port based on the argument.
-        } else if (arg == VERBOSE_FLAG) {
-            verbose = true; // Enable verbose mode.
-        }
+    if (arg == PORT_FLAG)
+    {
+      port = atoi(argv[i + 1]);
     }
+    else if (arg == VERBOSE_FLAG){
+      verbose = true;
+    }
+  }
 
-    ThreadPool threadPool = ThreadPool(); // Initialize the thread pool.
+  ThreadPool threadPool = ThreadPool();
 
-    // Run the UDP and TCP monitors in separate threads.
-    thread udpMonitorThread(runUdpMonitor, &threadPool, port, verbose);
-    thread tcpMonitorThread(runTcpMonitor, &threadPool, port, verbose);
+  // run each monitor in a separate thread
+  thread udpMonitorThread(runUdpMonitor, &threadPool, port, verbose);
+  thread tcpMonitorThread(runTcpMonitor, &threadPool, port, verbose);
 
-    printf("Waiting for monitors to finish\n");
+  printf("Waiting for monitors to finish\n");
+  udpMonitorThread.join();
+  tcpMonitorThread.join();
 
-    // Wait for the monitor threads to complete.
-    udpMonitorThread.join();
-    tcpMonitorThread.join();
-
-    return 0;
+  return 0;
 }

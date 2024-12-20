@@ -10,37 +10,36 @@
 #include <arpa/inet.h>
 #include <stdexcept>
 
+
 using namespace std;
 
-// Abstract class representing a generic socket for communication.
 class Socket {
 public:
-  Socket(); // Constructor.
-  ~Socket(); 
-  
-  // Pure virtual methods to be implemented by derived classes.
-  virtual void sendData(string data) = 0; // Sends data through the socket.
-  virtual string receiveData() = 0; // Receives data from the socket.
+  Socket();
+  ~Socket();
 
-  int getPort(); // Retrieves the port number.
-  void setPort(int port); // Sets the port number.
+  virtual void sendData(string data) = 0;
+  virtual string receiveData() = 0;
 
-  int getMonitorSocketfd(); // Retrieves the monitor socket file descriptor.
-  int getCommandSocketfd(); // Retrieves the command socket file descriptor.
+  int getPort();
+  void setPort(int port);
 
-  struct sockaddr_in getServerInfo(); // Retrieves server socket information.
-  void setServerInfo(struct sockaddr_in serverInfo); // Sets server socket information.
+  int getMonitorSocketfd();
+  int getCommandSocketfd();
 
-  struct sockaddr_in getClientInfo(); // Retrieves client socket information.
-  void setClientInfo(struct sockaddr_in clientInfo); // Sets client socket information.
+  struct sockaddr_in getServerInfo();
+  void setServerInfo(struct sockaddr_in serverInfo);
+
+  struct sockaddr_in getClientInfo();
+  void setClientInfo(struct sockaddr_in clientInfo);
 
 protected:
-  int port; // Port number for the socket.
-  int monitorSocketfd = -1; 
+  int port;
+  int monitorSocketfd = -1;
   int commandSocketfd = -1;
-  bool verbose; // Verbose mode for debugging.
-  struct sockaddr_in serverInfo; // Server socket information.
-  struct sockaddr_in clientInfo; // Client socket information.
+  bool verbose;
+  struct sockaddr_in serverInfo;
+  struct sockaddr_in clientInfo;
 };
 
 #endif

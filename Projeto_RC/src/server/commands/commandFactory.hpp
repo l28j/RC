@@ -25,7 +25,7 @@
 class CommandFactory {
 public:
 
-    static std::unique_ptr<Command> createCommand(const std::string& protocolMessage);
+    static Command *createCommand(const std::string& protocolMessage);
 
 };
 

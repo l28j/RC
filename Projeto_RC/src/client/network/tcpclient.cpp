@@ -51,7 +51,7 @@ string TcpClient::receiveData() {
 
     // Loop to read data from the socket until there's no more data.
     while (n != 0) {
-        char buffer[MAX_TCP_REPLY_SIZE];
+        char buffer[MAX_TCP_RECIEVE];
         n = read(this->sockfd, buffer, sizeof(buffer));
 
         if (n < 0) {
@@ -60,7 +60,7 @@ string TcpClient::receiveData() {
 
         totalBytes += n;
 
-        if (totalBytes > MAX_TCP_REPLY_SIZE) {
+        if (totalBytes > MAX_TCP_RECIEVE) {
             throw FileSizeError(); // Handle excessive data size.
         }
 

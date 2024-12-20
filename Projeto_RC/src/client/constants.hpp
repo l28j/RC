@@ -9,8 +9,9 @@
 #define DEFAULT_IP "127.0.0.1"
 #define DEFAULT_PORT 58031
 
-#define MAX_MESSAGE_SIZE 1024
-#define MAX_TCP_REPLY_SIZE 1024
+#define MAX_UDP_MESSAGE 32
+#define MAX_TCP_SEND 32
+#define MAX_TCP_RECIEVE 1024
 
 #define START "start"
 #define TRY "try"
