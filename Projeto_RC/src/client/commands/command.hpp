@@ -38,10 +38,8 @@ class Command {
 
         virtual ~Command() = default;
 
-        // sends data to Auction Server
         virtual void send() = 0;
 
-        // receives data from Auction Server
         virtual void receive() = 0;
 
         virtual int execute();
@@ -49,7 +47,6 @@ class Command {
         // returns local command used
         string getCommand();
 
-        // returns formatted string of data to send to auction server
         virtual string formatData() = 0;
 
         // pass client state to command
